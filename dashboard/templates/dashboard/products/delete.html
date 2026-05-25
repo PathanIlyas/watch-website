@@ -1,0 +1,15 @@
+{% extends 'dashboard/base.html' %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Delete Product</h2>
+    <a href="{% url 'dashboard_products' %}" class="btn btn-outline-light"><i class="fas fa-arrow-left"></i> Back</a>
+</div>
+<div class="glass-card">
+    <p>Are you sure you want to delete the product "{{ watch.name }}"?</p>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Yes, Delete</button>
+        <a href="{% url 'dashboard_products' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}

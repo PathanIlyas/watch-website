@@ -1,0 +1,226 @@
+{% extends 'dashboard/base.html' %}
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h4 class="mb-1">Order #{{ order.id }}</h4>
+    <p class="text-muted mb-0" style="font-size:.85rem;">
+      Placed {{ order.created_at|date:"d M Y, H:i" }} &bull;
+      <strong style="color:var(--accent-gold);">{{ order.get_status_display }}</strong>
+    </p>
+  </div>
+  <a href="{% url 'dashboard_orders' %}" class="btn btn-outline-secondary rounded-pill px-4">
+    <i class="fas fa-arrow-left me-2"></i>Back to Orders
+  </a>
+</div>
+
+<div class="row g-4">
+
+  <!-- LEFT: Customer + Items -->
+  <div class="col-lg-7">
+
+    <!-- Customer Details -->
+    <div class="glass-card mb-4">
+      <h5 class="mb-4" style="color:var(--accent-gold);"><i class="fas fa-user me-2"></i>Customer Details</h5>
+      <div class="row g-3">
+        <div class="col-md-6">
+          <p class="text-muted mb-1" style="font-size:.78rem;text-transform:uppercase;letter-spacing:.5px;">Full Name</p>
+          <p class="text-white mb-0 fw-500">{{ order.first_name }} {{ order.last_name }}</p>
+        </div>
+        <div class="col-md-6">
+          <p class="text-muted mb-1" style="font-size:.78rem;text-transform:uppercase;letter-spacing:.5px;">Email</p>
+          <p class="text-white mb-0">{{ order.email }}</p>
+        </div>
+        <div class="col-md-6">
+          <p class="text-muted mb-1" style="font-size:.78rem;text-transform:uppercase;letter-spacing:.5px;">Phone</p>
+          <p class="text-white mb-0">{{ order.phone }}</p>
+        </div>
+        <div class="col-md-6">
+          <p class="text-muted mb-1" style="font-size:.78rem;text-transform:uppercase;letter-spacing:.5px;">Order Total</p>
+          <p class="mb-0 fw-700" style="color:var(--accent-gold);font-size:1.1rem;">₹{{ order.total_amount }}</p>
+        </div>
+        <div class="col-12">
+          <p class="text-muted mb-1" style="font-size:.78rem;text-transform:uppercase;letter-spacing:.5px;">Shipping Address</p>
+          <p class="text-white mb-0">{{ order.address }}, {{ order.city }}{% if order.state %}, {{ order.state }}{% endif %} {{ order.postal_code }}, {{ order.country }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ordered Items -->
+    <div class="glass-card mb-4">
+      <h5 class="mb-4" style="color:var(--accent-gold);"><i class="fas fa-box me-2"></i>Ordered Items</h5>
+      <div class="table-responsive">
+        <table class="table table-dark table-borderless align-middle mb-0">
+          <thead>
+            <tr>
+              <th style="color:var(--text-muted);font-size:.78rem;text-transform:uppercase;letter-spacing:.5px;">Product</th>
+              <th style="color:var(--text-muted);font-size:.78rem;text-transform:uppercase;letter-spacing:.5px;text-align:center;">Qty</th>
+              <th style="color:var(--text-muted);font-size:.78rem;text-transform:uppercase;letter-spacing:.5px;text-align:right;">Price</th>
+              <th style="color:var(--text-muted);font-size:.78rem;text-transform:uppercase;letter-spacing:.5px;text-align:right;">Subtotal</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in order.items.all %}
+            <tr>
+              <td>
+                <div class="d-flex align-items-center gap-3">
+                  {% if item.watch.images.first %}
+                    <img src="{{ item.watch.images.first.image.url }}" alt="{{ item.watch.name }}"
+                         style="width:44px;height:44px;object-fit:cover;border-radius:8px;border:1px solid rgba(212,175,55,.2);">
+                  {% else %}
+                    <div style="width:44px;height:44px;border-radius:8px;background:#2a2a2a;display:flex;align-items:center;justify-content:center;">
+                      <i class="fas fa-clock text-muted"></i>
+                    </div>
+                  {% endif %}
+                  <div>
+                    <p class="text-white mb-0" style="font-size:.9rem;">{{ item.watch.name }}</p>
+                    <p class="text-muted mb-0" style="font-size:.78rem;">{{ item.watch.brand }}</p>
+                  </div>
+                </div>
+              </td>
+              <td class="text-center text-white">{{ item.quantity }}</td>
+              <td class="text-end text-white">₹{{ item.price }}</td>
+              <td class="text-end fw-700" style="color:var(--accent-gold);">₹{{ item.subtotal }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="4" class="text-center text-muted py-4">No items found.</td></tr>
+            {% endfor %}
+          </tbody>
+          <tfoot>
+            <tr style="border-top:1px solid rgba(255,255,255,.08);">
+              <td colspan="3" class="text-end text-muted pt-3">Order Total</td>
+              <td class="text-end fw-700 pt-3" style="color:var(--accent-gold);font-size:1.1rem;">₹{{ order.total_amount }}</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+
+    <!-- Payment Info -->
+    {% if order.payment %}
+    <div class="glass-card mb-4">
+      <h5 class="mb-4" style="color:var(--accent-gold);"><i class="fas fa-credit-card me-2"></i>Payment Details</h5>
+      <div class="row g-3">
+        <div class="col-md-4">
+          <p class="text-muted mb-1" style="font-size:.78rem;text-transform:uppercase;letter-spacing:.5px;">Method</p>
+          <p class="text-white mb-0">{{ order.payment.payment_method }}</p>
+        </div>
+        <div class="col-md-4">
+          <p class="text-muted mb-1" style="font-size:.78rem;text-transform:uppercase;letter-spacing:.5px;">Status</p>
+          {% if order.payment.status == 'Completed' %}
+            <span class="badge rounded-pill badge-green">Paid</span>
+          {% elif order.payment.status == 'Pending' %}
+            <span class="badge rounded-pill badge-gold">Pending</span>
+          {% else %}
+            <span class="badge rounded-pill badge-red">{{ order.payment.status }}</span>
+          {% endif %}
+        </div>
+        {% if order.payment.transaction_id %}
+        <div class="col-md-4">
+          <p class="text-muted mb-1" style="font-size:.78rem;text-transform:uppercase;letter-spacing:.5px;">Transaction ID</p>
+          <p class="text-white mb-0" style="font-size:.8rem;word-break:break-all;">{{ order.payment.transaction_id }}</p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Status History -->
+    {% if history %}
+    <div class="glass-card">
+      <h5 class="mb-4" style="color:var(--accent-gold);"><i class="fas fa-history me-2"></i>Status History</h5>
+      <div style="position:relative;">
+        {% for event in history %}
+        <div class="d-flex gap-3 mb-3">
+          <div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;">
+            <div style="width:12px;height:12px;border-radius:50%;background:var(--accent-gold);flex-shrink:0;margin-top:3px;"></div>
+            {% if not forloop.last %}<div style="width:2px;flex:1;background:rgba(212,175,55,.2);margin:4px 0;min-height:20px;"></div>{% endif %}
+          </div>
+          <div class="pb-2">
+            <p class="text-white mb-0 fw-500" style="font-size:.9rem;">{{ event.status }}</p>
+            {% if event.note %}<p class="text-muted mb-0" style="font-size:.82rem;">{{ event.note }}</p>{% endif %}
+            <p class="text-muted mb-0" style="font-size:.75rem;">{{ event.created_at|date:"d M Y, H:i" }}</p>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+  </div>
+
+  <!-- RIGHT: Update Form -->
+  <div class="col-lg-5">
+    <div class="glass-card sticky-top" style="top:90px;">
+      <h5 class="mb-4" style="color:var(--accent-gold);"><i class="fas fa-edit me-2"></i>Update Order</h5>
+
+      <form method="post">
+        {% csrf_token %}
+
+        <!-- Status -->
+        <div class="mb-4">
+          <label class="form-label">Order Status</label>
+          {{ form.status }}
+          <div class="mt-2 p-3 rounded" style="background:rgba(212,175,55,.05);border:1px solid rgba(212,175,55,.1);">
+            <p class="text-muted mb-0" style="font-size:.78rem;">
+              <i class="fas fa-info-circle me-1" style="color:var(--accent-gold);"></i>
+              Changing to <strong>Shipped</strong>, <strong>Out for Delivery</strong>, or <strong>Delivered</strong>
+              will automatically send a branded email to the customer.
+            </p>
+          </div>
+        </div>
+
+        <!-- Tracking Number -->
+        <div class="mb-3">
+          <label class="form-label">Tracking Number</label>
+          <input type="text" name="tracking_number" class="form-control"
+                 placeholder="e.g. DTDC123456789IN"
+                 value="{{ order.tracking_number|default:'' }}">
+        </div>
+
+        <!-- Courier -->
+        <div class="mb-3">
+          <label class="form-label">Courier / Carrier</label>
+          <input type="text" name="courier_name" class="form-control"
+                 placeholder="e.g. FedEx, DTDC, BlueDart"
+                 value="{{ order.courier_name|default:'' }}">
+        </div>
+
+        <!-- Estimated Delivery -->
+        <div class="mb-3">
+          <label class="form-label">Estimated Delivery Date</label>
+          <input type="date" name="estimated_delivery" class="form-control"
+                 value="{{ order.estimated_delivery|date:'Y-m-d'|default:'' }}">
+        </div>
+
+        <!-- Admin Notes -->
+        <div class="mb-4">
+          <label class="form-label">Admin Notes <span class="text-muted">(included in status history)</span></label>
+          <textarea name="admin_notes" class="form-control" rows="3"
+                    placeholder="e.g. Dispatched via FedEx Priority">{{ order.admin_notes|default:'' }}</textarea>
+        </div>
+
+        <button type="submit" class="btn w-100 fw-700 py-3"
+                style="background:linear-gradient(135deg,#D4AF37,#B8960C);color:#000;border:none;border-radius:10px;letter-spacing:1px;text-transform:uppercase;">
+          <i class="fas fa-save me-2"></i>Update Order
+        </button>
+      </form>
+
+      <!-- Quick Links -->
+      <div class="mt-4 pt-3" style="border-top:1px solid rgba(255,255,255,.07);">
+        <p class="text-muted mb-2" style="font-size:.78rem;text-transform:uppercase;letter-spacing:.5px;">Quick Actions</p>
+        <div class="d-flex gap-2 flex-wrap">
+          <a href="mailto:{{ order.email }}" class="btn btn-sm btn-outline-secondary rounded-pill">
+            <i class="fas fa-envelope me-1"></i>Email Customer
+          </a>
+          <a href="{% url 'track_order' %}?order_id={{ order.id }}" target="_blank"
+             class="btn btn-sm btn-outline-secondary rounded-pill">
+            <i class="fas fa-external-link-alt me-1"></i>View Tracking
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

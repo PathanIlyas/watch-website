@@ -1,0 +1,344 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Track Order — CHRONOS Luxury Watches</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <style>
+    :root { --bg:#0B0B0B; --gold:#D4AF37; --card:#1A1A1A; --text:#F5F5F5; --muted:#A0A0A0; }
+    body { background:var(--bg); color:var(--text); font-family:'Poppins',sans-serif; }
+    .navbar { background:rgba(11,11,11,.95)!important; backdrop-filter:blur(20px); border-bottom:1px solid rgba(212,175,55,.15); }
+    .navbar-brand { color:var(--gold)!important; font-family:'Playfair Display',serif; font-size:1.5rem; letter-spacing:3px; }
+    .nav-link { color:rgba(245,245,245,.8)!important; font-size:.85rem; letter-spacing:1px; text-transform:uppercase; }
+    .nav-link:hover { color:var(--gold)!important; }
+    .page-header { padding:130px 0 60px; background:linear-gradient(180deg,rgba(212,175,55,.05) 0%,transparent 100%); border-bottom:1px solid rgba(212,175,55,.1); }
+    .page-header h1 { font-family:'Playfair Display',serif; }
+
+    /* Search box */
+    .search-card { background:var(--card); border:1px solid rgba(212,175,55,.2); border-radius:16px; padding:2.5rem; }
+    .form-control { background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.1); color:var(--text); border-radius:10px; padding:14px 18px; }
+    .form-control:focus { background:rgba(212,175,55,.05); border-color:var(--gold); color:var(--text); box-shadow:0 0 0 3px rgba(212,175,55,.1); }
+    .form-control::placeholder { color:rgba(245,245,245,.3); }
+    .btn-gold { background:linear-gradient(135deg,#D4AF37,#B8960C); color:#000; font-weight:700; border:none; border-radius:10px; padding:14px 32px; letter-spacing:1px; text-transform:uppercase; transition:all .3s; }
+    .btn-gold:hover { transform:translateY(-2px); box-shadow:0 10px 30px rgba(212,175,55,.4); color:#000; }
+    .text-gold { color:var(--gold); }
+
+    /* Timeline */
+    .timeline-wrapper { position:relative; padding:10px 0; }
+    .timeline-track { display:flex; justify-content:space-between; align-items:flex-start; position:relative; }
+    .timeline-track::before {
+      content:''; position:absolute; top:24px; left:5%; right:5%;
+      height:3px; background:rgba(255,255,255,.08); z-index:0;
+    }
+    .timeline-progress {
+      content:''; position:absolute; top:24px; left:5%;
+      height:3px; background:linear-gradient(90deg,var(--gold),rgba(212,175,55,.4));
+      z-index:1; transition:width 1s ease;
+    }
+    .step-item { flex:1; text-align:center; position:relative; z-index:2; }
+    .step-icon {
+      width:48px; height:48px; border-radius:50%;
+      display:flex; align-items:center; justify-content:center;
+      margin:0 auto 10px; font-size:1.1rem;
+      border:2px solid rgba(255,255,255,.1);
+      background:var(--card); color:var(--muted);
+      transition:all .4s;
+    }
+    .step-item.done .step-icon { background:var(--gold); color:#000; border-color:var(--gold); box-shadow:0 0 20px rgba(212,175,55,.4); }
+    .step-item.active .step-icon { background:rgba(212,175,55,.15); color:var(--gold); border-color:var(--gold); animation:pulse-step 1.5s infinite; }
+    .step-label { font-size:.72rem; color:var(--muted); line-height:1.3; }
+    .step-item.done .step-label, .step-item.active .step-label { color:var(--gold); }
+    @keyframes pulse-step { 0%,100%{box-shadow:0 0 0 0 rgba(212,175,55,.4)} 50%{box-shadow:0 0 0 10px rgba(212,175,55,0)} }
+
+    /* Cancelled banner */
+    .cancelled-banner { background:rgba(220,53,69,.1); border:1px solid rgba(220,53,69,.3); border-radius:12px; padding:20px 24px; }
+
+    /* Order card */
+    .order-card { background:var(--card); border:1px solid rgba(212,175,55,.15); border-radius:16px; padding:2rem; }
+    .order-card h5 { font-family:'Playfair Display',serif; color:var(--gold); }
+    .divider { border-color:rgba(255,255,255,.07); }
+    .product-img { width:56px; height:56px; object-fit:cover; border-radius:8px; border:1px solid rgba(212,175,55,.2); }
+    .badge-status { background:rgba(212,175,55,.12); color:var(--gold); border:1px solid rgba(212,175,55,.3); border-radius:20px; padding:4px 14px; font-size:.8rem; font-weight:500; }
+    .badge-paid { background:rgba(40,167,69,.12); color:#28a745; border:1px solid rgba(40,167,69,.3); }
+    .badge-cod  { background:rgba(23,162,184,.12); color:#17a2b8; border:1px solid rgba(23,162,184,.3); }
+
+    /* History timeline */
+    .history-item { display:flex; gap:16px; padding:12px 0; border-bottom:1px solid rgba(255,255,255,.05); }
+    .history-item:last-child { border-bottom:none; }
+    .history-dot { width:10px; height:10px; border-radius:50%; background:var(--gold); flex-shrink:0; margin-top:5px; }
+    .history-line { width:2px; background:rgba(212,175,55,.2); flex-shrink:0; }
+
+    @media(max-width:768px) {
+      .step-label { font-size:.65rem; }
+      .step-icon { width:38px; height:38px; font-size:.9rem; }
+      .timeline-track::before { top:19px; }
+      .timeline-progress { top:19px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="{% url 'home' %}">CHRONOS</a>
+    <button class="navbar-toggler shadow-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <i class="fas fa-bars text-white fs-5"></i>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav mx-auto">
+        <li class="nav-item"><a class="nav-link" href="{% url 'home' %}">Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'collection' %}">Collection</a></li>
+        <li class="nav-item"><a class="nav-link active" href="{% url 'track_order' %}">Track Order</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'contact' %}">Contact</a></li>
+      </ul>
+      <div class="d-flex align-items-center gap-3">
+        <a href="{% url 'cart' %}" class="nav-link position-relative">
+          <i class="fas fa-shopping-bag fs-5"></i>
+          <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill" style="background:var(--gold);color:#000;font-size:.65rem;">{{ cart_count|default:"0" }}</span>
+        </a>
+        {% if user.is_authenticated %}
+          <a href="{% url 'profile' %}" class="nav-link d-flex align-items-center gap-2" style="color:var(--gold)!important;">
+            <i class="fas fa-user-circle fs-5"></i>
+            <span class="d-none d-lg-inline" style="font-size:.8rem;letter-spacing:1px;text-transform:uppercase;">{{ user.first_name|default:user.username }}</span>
+          </a>
+          <a href="{% url 'logout' %}" class="nav-link" style="font-size:.8rem;letter-spacing:1px;text-transform:uppercase;color:rgba(245,245,245,.6)!important;">
+            <i class="fas fa-sign-out-alt me-1"></i>Logout
+          </a>
+        {% else %}
+          <a href="{% url 'login' %}" class="nav-link" style="font-size:.8rem;letter-spacing:1px;text-transform:uppercase;">
+            <i class="fas fa-sign-in-alt me-1"></i>Login
+          </a>
+          <a href="{% url 'register' %}" class="nav-link px-3 py-1 rounded" style="font-size:.8rem;letter-spacing:1px;text-transform:uppercase;background:linear-gradient(135deg,#D4AF37,#B8960C);color:#000!important;font-weight:700;">
+            Register
+          </a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- Page Header -->
+<div class="page-header">
+  <div class="container">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb" style="font-size:.8rem;">
+        <li class="breadcrumb-item"><a href="{% url 'home' %}" style="color:var(--gold);">Home</a></li>
+        <li class="breadcrumb-item active text-secondary">Track Order</li>
+      </ol>
+    </nav>
+    <h1 class="text-white mb-2">Track Your Order</h1>
+    <p class="text-secondary mb-0"><i class="fas fa-map-marker-alt me-2" style="color:var(--gold);"></i>Real-time order status for your luxury timepiece</p>
+  </div>
+</div>
+
+<section style="padding:60px 0 100px;">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-9">
+
+        <!-- Search Form -->
+        <div class="search-card mb-5">
+          <h5 class="text-white mb-1" style="font-family:'Playfair Display',serif;">Enter Your Order ID</h5>
+          <p class="text-secondary mb-4" style="font-size:.9rem;">Find your order ID in the confirmation email sent to you after purchase.</p>
+          <form method="post" action="{% url 'track_order' %}">
+            {% csrf_token %}
+            <div class="d-flex gap-3 flex-column flex-sm-row">
+              <input type="number" name="order_id" class="form-control flex-grow-1"
+                     placeholder="e.g. 1042" value="{{ order_id_input }}" required min="1">
+              <button type="submit" class="btn btn-gold px-4">
+                <i class="fas fa-search me-2"></i>Track Order
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Error -->
+        {% if error %}
+        <div class="alert mb-5" style="background:rgba(220,53,69,.1);border:1px solid rgba(220,53,69,.3);border-radius:12px;color:#f8d7da;">
+          <i class="fas fa-exclamation-circle me-2 text-danger"></i>{{ error }}
+        </div>
+        {% endif %}
+
+        {% if order %}
+        <!-- ── Order Found ── -->
+
+        <!-- Status Timeline -->
+        {% if order.is_cancelled %}
+        <div class="cancelled-banner mb-5 text-center">
+          <i class="fas fa-times-circle fa-2x text-danger mb-3 d-block"></i>
+          <h5 class="text-white mb-1">Order Cancelled</h5>
+          <p class="text-secondary mb-0">Order #{{ order.id }} has been cancelled. Contact support for assistance.</p>
+        </div>
+        {% else %}
+        <div class="order-card mb-5">
+          <h5 class="mb-4">Delivery Progress</h5>
+          <div class="timeline-wrapper">
+            <div class="timeline-track" id="timelineTrack">
+              {% for step_key, step_label, step_icon in steps %}
+              {% with forloop.counter0 as idx %}
+              <div class="step-item {% if order.step > idx %}done{% elif order.step == idx %}active{% endif %}">
+                <div class="step-icon"><i class="{{ step_icon }}"></i></div>
+                <div class="step-label">{{ step_label }}</div>
+              </div>
+              {% endwith %}
+              {% endfor %}
+            </div>
+            <!-- Progress bar filled by JS -->
+            <div class="timeline-progress" id="timelineProgress" style="width:0;"></div>
+          </div>
+        </div>
+        {% endif %}
+
+        <!-- Order Details -->
+        <div class="row g-4 mb-4">
+          <div class="col-md-6">
+            <div class="order-card h-100">
+              <h5 class="mb-3">Order Information</h5>
+              <table class="w-100" style="border-collapse:collapse;">
+                <tr><td class="text-secondary pb-2" style="font-size:.85rem;width:45%;">Order ID</td><td class="text-white pb-2 fw-600">#{{ order.id }}</td></tr>
+                <tr><td class="text-secondary pb-2" style="font-size:.85rem;">Order Date</td><td class="text-white pb-2">{{ order.created_at|date:"d M Y" }}</td></tr>
+                <tr><td class="text-secondary pb-2" style="font-size:.85rem;">Status</td>
+                    <td class="pb-2"><span class="badge-status">{{ order.get_status_display }}</span></td></tr>
+                {% if order.estimated_delivery %}
+                <tr><td class="text-secondary pb-2" style="font-size:.85rem;">Est. Delivery</td><td class="text-white pb-2">{{ order.estimated_delivery|date:"d M Y" }}</td></tr>
+                {% endif %}
+                {% if order.tracking_number %}
+                <tr><td class="text-secondary pb-2" style="font-size:.85rem;">Tracking No.</td><td class="text-white pb-2" style="font-size:.85rem;">{{ order.tracking_number }}</td></tr>
+                {% endif %}
+                {% if order.courier_name %}
+                <tr><td class="text-secondary pb-2" style="font-size:.85rem;">Courier</td><td class="text-white pb-2">{{ order.courier_name }}</td></tr>
+                {% endif %}
+              </table>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="order-card h-100">
+              <h5 class="mb-3">Shipping Address</h5>
+              <p class="text-white mb-1 fw-500">{{ order.full_name }}</p>
+              <p class="text-secondary mb-1" style="font-size:.9rem;">{{ order.address }}</p>
+              <p class="text-secondary mb-1" style="font-size:.9rem;">{{ order.city }}{% if order.state %}, {{ order.state }}{% endif %} {{ order.postal_code }}</p>
+              <p class="text-secondary mb-3" style="font-size:.9rem;">{{ order.country }}</p>
+              <hr class="divider">
+              <p class="text-secondary mb-1" style="font-size:.85rem;">Phone</p>
+              <p class="text-white mb-0">{{ order.phone }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Items -->
+        <div class="order-card mb-4">
+          <h5 class="mb-4">Items in This Order</h5>
+          {% for item in order.items.all %}
+          <div class="d-flex align-items-center gap-3 py-3 {% if not forloop.last %}border-bottom{% endif %}" style="border-color:rgba(255,255,255,.06);">
+            {% if item.watch.images.first %}
+              <img src="{{ item.watch.images.first.image.url }}" alt="{{ item.watch.name }}" class="product-img">
+            {% else %}
+              <div class="product-img d-flex align-items-center justify-content-center" style="background:#2a2a2a;"><i class="fas fa-clock text-secondary"></i></div>
+            {% endif %}
+            <div class="flex-grow-1">
+              <p class="text-white mb-0 fw-500">{{ item.watch.name }}</p>
+              <p class="text-secondary mb-0" style="font-size:.82rem;">{{ item.watch.brand }} &bull; Qty: {{ item.quantity }}</p>
+            </div>
+            <span class="text-gold fw-700">₹{{ item.price }}</span>
+          </div>
+          {% endfor %}
+          <hr class="divider mt-3">
+          <div class="d-flex justify-content-between align-items-center">
+            <span class="text-secondary">Order Total</span>
+            <span class="text-gold fs-5 fw-700">₹{{ order.total_amount }}</span>
+          </div>
+        </div>
+
+        <!-- Payment Status -->
+        <div class="order-card mb-4">
+          <h5 class="mb-3">Payment Status</h5>
+          {% if order.payment %}
+            <div class="d-flex align-items-center gap-3">
+              <div>
+                <p class="text-secondary mb-1" style="font-size:.85rem;">Method</p>
+                <p class="text-white mb-0">{{ order.payment.payment_method }}</p>
+              </div>
+              <div class="ms-4">
+                <p class="text-secondary mb-1" style="font-size:.85rem;">Status</p>
+                {% if order.payment.status == 'Completed' %}
+                  <span class="badge-status badge-paid">Paid</span>
+                {% elif order.payment.status == 'Pending' %}
+                  <span class="badge-status badge-cod">Pending (COD)</span>
+                {% else %}
+                  <span class="badge-status">{{ order.payment.status }}</span>
+                {% endif %}
+              </div>
+              {% if order.payment.transaction_id %}
+              <div class="ms-4">
+                <p class="text-secondary mb-1" style="font-size:.85rem;">Transaction ID</p>
+                <p class="text-white mb-0" style="font-size:.82rem;">{{ order.payment.transaction_id }}</p>
+              </div>
+              {% endif %}
+            </div>
+          {% else %}
+            <p class="text-secondary mb-0">Payment information not available.</p>
+          {% endif %}
+        </div>
+
+        <!-- Status History -->
+        {% if history %}
+        <div class="order-card mb-4">
+          <h5 class="mb-4">Status History</h5>
+          {% for event in history %}
+          <div class="history-item">
+            <div>
+              <div class="history-dot mt-1"></div>
+            </div>
+            <div>
+              <p class="text-white mb-0 fw-500" style="font-size:.9rem;">{{ event.status }}</p>
+              {% if event.note %}<p class="text-secondary mb-0" style="font-size:.82rem;">{{ event.note }}</p>{% endif %}
+              <p class="text-secondary mb-0" style="font-size:.78rem;">{{ event.created_at|date:"d M Y, H:i" }}</p>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- CTA -->
+        <div class="d-flex gap-3 flex-wrap">
+          <a href="{% url 'collection' %}" class="btn btn-gold"><i class="fas fa-shopping-bag me-2"></i>Continue Shopping</a>
+          <a href="{% url 'contact' %}" class="btn" style="border:1px solid var(--gold);color:var(--gold);border-radius:10px;padding:14px 28px;transition:all .3s;" onmouseover="this.style.background='rgba(212,175,55,.1)'" onmouseout="this.style.background='transparent'">
+            <i class="fas fa-headset me-2"></i>Contact Support
+          </a>
+        </div>
+
+        {% endif %}{# end if order #}
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer style="background:#0a0a0a;border-top:1px solid rgba(255,255,255,.05);padding:30px 0;">
+  <div class="container text-center">
+    <p class="text-secondary mb-0" style="font-size:.85rem;">&copy; 2026 CHRONOS Watches. All Rights Reserved.</p>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  // Animate the progress bar
+  (function() {
+    const steps = document.querySelectorAll('.step-item');
+    const bar   = document.getElementById('timelineProgress');
+    if (!steps.length || !bar) return;
+    const total = steps.length - 1;
+    const done  = document.querySelectorAll('.step-item.done').length;
+    const pct   = total > 0 ? (done / total) * 90 : 0;
+    setTimeout(() => { bar.style.width = pct + '%'; }, 300);
+  })();
+</script>
+</body>
+</html>

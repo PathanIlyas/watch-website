@@ -1,0 +1,166 @@
+"""
+Django settings for CHRONOS Luxury Watches.
+"""
+
+from pathlib import Path
+from datetime import timedelta
+import environ
+import os
+import mimetypes
+
+env = environ.Env(DEBUG=(bool, False))
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
+
+# ─── Security ─────────────────────────────────────────────────
+SECRET_KEY = env('SECRET_KEY', default='django-insecure-fallback-key-change-in-production')
+DEBUG = env('DEBUG', default=False)
+ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['*'])
+
+LOGIN_URL = '/accounts/login/'
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
+
+# ─── Apps ─────────────────────────────────────────────────────
+INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+
+    # Third-party
+    'rest_framework',
+    'corsheaders',
+
+    # Local apps
+    'accounts',
+    'store',
+    'orders',
+    'dashboard',
+    'payments',
+    'otp_auth',
+]
+
+# ─── Middleware ────────────────────────────────────────────────
+MIDDLEWARE = [
+    'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]
+
+ROOT_URLCONF = 'core.urls'
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [BASE_DIR / 'template'],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+                'store.context_processors.cart_context',
+            ],
+        },
+    },
+]
+
+WSGI_APPLICATION = 'core.wsgi.application'
+
+# ─── Database ─────────────────────────────────────────────────
+import dj_database_url
+
+DATABASES = {
+    'default': dj_database_url.config(
+        default=env('DATABASE_URL', default=f'sqlite:///{BASE_DIR}/db.sqlite3'),
+        conn_max_age=600,
+    )
+}
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# ─── Auth ─────────────────────────────────────────────────────
+AUTH_USER_MODEL = 'accounts.CustomUser'
+
+AUTH_PASSWORD_VALIDATORS = [
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
+]
+
+# ─── Internationalisation ─────────────────────────────────────
+LANGUAGE_CODE = 'en-us'
+TIME_ZONE = 'Asia/Kolkata'
+USE_I18N = True
+USE_TZ = True
+
+# ─── Static & Media ───────────────────────────────────────────
+STATIC_URL = '/static/'
+mimetypes.add_type("text/css", ".css", True)
+mimetypes.add_type("application/javascript", ".js", True)
+
+STATICFILES_DIRS = [BASE_DIR / 'static']
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
+# ─── REST Framework ───────────────────────────────────────────
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+}
+
+CORS_ALLOW_ALL_ORIGINS = True
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+    'AUTH_HEADER_TYPES': ('Bearer',),
+}
+
+# ─── Razorpay ─────────────────────────────────────────────────
+RAZORPAY_KEY_ID = env('RAZORPAY_KEY_ID', default='rzp_test_placeholder')
+RAZORPAY_KEY_SECRET = env('RAZORPAY_KEY_SECRET', default='placeholder_secret')
+
+# ─── Email / SMTP ─────────────────────────────────────────────
+EMAIL_BACKEND = env('EMAIL_BACKEND', default='django.core.mail.backends.smtp.EmailBackend')
+EMAIL_HOST = env('EMAIL_HOST', default='smtp.gmail.com')
+EMAIL_PORT = env.int('EMAIL_PORT', default=587)
+EMAIL_USE_TLS = env.bool('EMAIL_USE_TLS', default=True)
+EMAIL_HOST_USER = env('EMAIL_HOST_USER', default='')
+EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD', default='')
+DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL', default='CHRONOS Luxury Watches <noreply@chronos.com>')
+ADMIN_EMAIL = env('ADMIN_EMAIL', default='admin@chronos.com')
+
+# ─── Auto Admin ───────────────────────────────────────────────
+ADMIN_USERNAME = env('ADMIN_USERNAME', default='admin')
+ADMIN_PASSWORD = env('ADMIN_PASSWORD', default='admin')
+
+# ─── OTP / SMS ────────────────────────────────────────────────
+SMS_PROVIDER           = env('SMS_PROVIDER', default='console')
+FAST2SMS_API_KEY       = env('FAST2SMS_API_KEY', default='your_fast2sms_api_key_here')
+TWILIO_ACCOUNT_SID     = env('TWILIO_ACCOUNT_SID', default='')
+TWILIO_AUTH_TOKEN      = env('TWILIO_AUTH_TOKEN', default='')
+TWILIO_PHONE_NUMBER    = env('TWILIO_PHONE_NUMBER', default='')
+OTP_EXPIRY_MINUTES     = env.int('OTP_EXPIRY_MINUTES', default=5)
+OTP_MAX_ATTEMPTS       = env.int('OTP_MAX_ATTEMPTS', default=5)
+OTP_RATE_LIMIT_MINUTES = env.int('OTP_RATE_LIMIT_MINUTES', default=1)
+
+# ─── Brand ────────────────────────────────────────────────────
+BRAND_NAME = 'CHRONOS'
+BRAND_TAGLINE = 'Precision. Elegance. Legacy.'
+SITE_URL = env('SITE_URL', default='http://localhost:8000')

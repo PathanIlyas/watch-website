@@ -1,0 +1,29 @@
+{% extends 'dashboard/base.html' %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Homepage Banners</h2>
+    <a href="{% url 'dashboard_banner_create' %}" class="btn btn-outline-warning"><i class="fas fa-plus"></i> Add Banner</a>
+</div>
+<div class="glass-card">
+    <div class="table-responsive">
+        <table class="table table-dark table-hover mb-0">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Link</th>
+                    <th>Active</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for banner in banners %}
+                <tr>
+                    <td>{{ banner.title }}</td>
+                    <td>{{ banner.link }}</td>
+                    <td>{% if banner.is_active %}<i class="fas fa-check text-success"></i>{% else %}<i class="fas fa-times text-danger"></i>{% endif %}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

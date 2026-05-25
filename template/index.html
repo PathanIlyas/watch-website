@@ -1,0 +1,277 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CHRONOS | Premium Luxury Watches</title>
+    <meta name="description" content="Discover our collection of premium luxury watches. High-end Swiss movement timepieces for the modern connoisseur.">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'home' %}">CHRONOS</a>
+            <button class="navbar-toggler shadow-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <i class="fas fa-bars text-white fs-3"></i>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav mx-auto">
+                    <li class="nav-item"><a class="nav-link active" href="{% url 'home' %}">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'collection' %}">Collection</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'about' %}">Story</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'track_order' %}">Track Order</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'contact' %}">Contact</a></li>
+                </ul>
+                <div class="d-flex align-items-center gap-3">
+                    <a href="{% url 'cart' %}" class="nav-link position-relative">
+                        <i class="fas fa-shopping-bag fs-5"></i>
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill" style="background-color: var(--accent-gold); color: #000;">{{ cart_count|default:"0" }}</span>
+                    </a>
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'profile' %}" class="nav-link d-flex align-items-center gap-2" style="color:var(--accent-gold)!important;">
+                            <i class="fas fa-user-circle fs-5"></i>
+                            <span class="d-none d-lg-inline" style="font-size:.8rem;letter-spacing:1px;text-transform:uppercase;">{{ user.first_name|default:user.username }}</span>
+                        </a>
+                        <a href="{% url 'logout' %}" class="nav-link" style="font-size:.8rem;letter-spacing:1px;text-transform:uppercase;color:rgba(245,245,245,.6)!important;">
+                            <i class="fas fa-sign-out-alt me-1"></i>Logout
+                        </a>
+                    {% else %}
+                        <a href="{% url 'login' %}" class="nav-link" style="font-size:.8rem;letter-spacing:1px;text-transform:uppercase;">
+                            <i class="fas fa-sign-in-alt me-1"></i>Login
+                        </a>
+                        <a href="{% url 'register' %}" class="nav-link px-3 py-1 rounded" style="font-size:.8rem;letter-spacing:1px;text-transform:uppercase;background:linear-gradient(135deg,#D4AF37,#B8960C);color:#000!important;font-weight:700;">
+                            Register
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <img src="{% static 'images/hero.png' %}" alt="Luxury Watch" class="hero-bg">
+        <div class="hero-overlay"></div>
+        <div class="container position-relative z-1">
+            <div class="row">
+                <div class="col-lg-8">
+                    <span class="section-subtitle hero-subtitle text-start" style="text-align: left;">Masterpiece of Time</span>
+                    <h1 class="hero-title text-white">Elegance In Every <br><span class="text-gold">Tick.</span></h1>
+                    <p class="hero-subtitle text-white-50">Experience the pinnacle of Swiss craftsmanship with our exclusive collection of luxury timepieces.</p>
+                    <div class="d-flex gap-3">
+                        <a href="{% url 'collection' %}" class="btn btn-gold hero-btn">Explore Collection</a>
+                        <a href="#featured" class="btn btn-outline-gold hero-btn">Discover More</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Collections Section -->
+    <section id="featured" class="section-padding">
+        <div class="container">
+            <div class="row mb-5" data-aos="fade-up">
+                <div class="col-12 text-center">
+                    <span class="section-subtitle">Exquisite Series</span>
+                    <h2 class="section-title">Featured Collections</h2>
+                </div>
+            </div>
+            <div class="row g-4">
+                {% for watch in featured_watches %}
+                <div class="col-md-3" data-aos="fade-up" data-aos-delay="100">
+                    <a href="{% url 'product' watch.slug %}" class="text-decoration-none">
+                        <div class="watch-card">
+                            <div class="watch-img-wrap">
+                                <img src="{% if watch.images.first %}{{ watch.images.first.image.url }}{% else %}{% static 'images/default_watch.png' %}{% endif %}" alt="{{ watch.name }}">
+                            </div>
+                            <div class="watch-info">
+                                <h3 class="watch-title text-white">{{ watch.name }}</h3>
+                                <p class="mb-0 text-gold">View Product</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                {% empty %}
+                <p class="text-white text-center">No featured watches at the moment.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+    <!-- Trending Watches Slider -->
+    <section class="section-padding" style="background: #080808;">
+        <div class="container">
+            <div class="row align-items-center mb-5" data-aos="fade-up">
+                <div class="col-md-8">
+                    <span class="section-subtitle text-start" style="text-align: left;">New Arrivals</span>
+                    <h2 class="section-title text-start mb-0" style="text-align: left;">Trending Timepieces</h2>
+                </div>
+                <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                    <a href="{% url 'collection' %}" class="btn btn-outline-gold">View All</a>
+                </div>
+            </div>
+            
+            <div class="swiper trending-slider" data-aos="fade-up" data-aos-delay="200">
+                <div class="swiper-wrapper">
+                    {% for watch in trending_watches %}
+                    <div class="swiper-slide">
+                        <div class="watch-card text-center p-3">
+                            <div class="watch-img-wrap">
+                                <img src="{% if watch.images.first %}{{ watch.images.first.image.url }}{% else %}{% static 'images/default_watch.png' %}{% endif %}" alt="{{ watch.name }}">
+                            </div>
+                            <div class="watch-info">
+                                <h3 class="watch-title text-white">{{ watch.name }}</h3>
+                                <div class="watch-price">${{ watch.price }}</div>
+                                <a href="{% url 'product' watch.slug %}" class="btn btn-outline-gold w-100">Quick View</a>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <p class="text-white text-center">No trending watches available at the moment.</p>
+                    {% endfor %}
+                </div>
+                <div class="swiper-pagination mt-5 position-relative"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Luxury Story Section -->
+    <section class="story-section" style="background-image: linear-gradient(rgba(11,11,11,0.8), rgba(11,11,11,0.8)), url('{% static 'images/hero.png' %}');">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8 text-center glass-effect p-5" data-aos="zoom-in">
+                    <span class="section-subtitle">Our Heritage</span>
+                    <h2 class="section-title text-white mb-4">A Legacy of Precision</h2>
+                    <p class="mb-4">Since 1924, CHRONOS has been at the forefront of horological innovation. Every timepiece is a testament to our commitment to craftsmanship, utilizing only the finest materials and masterful Swiss techniques to create watches that transcend time itself.</p>
+                    <img src="{% static 'images/gold.png' %}" alt="Signature" style="height: 60px; object-fit: contain; filter: brightness(0) invert(1) sepia(1) saturate(5) hue-rotate(5deg);">
+                    <div class="mt-4">
+                        <a href="{% url 'about' %}" class="btn btn-gold">Read Our Story</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Watch Features Section -->
+    <section class="section-padding">
+        <div class="container">
+            <div class="row mb-5" data-aos="fade-up">
+                <div class="col-12 text-center">
+                    <span class="section-subtitle">Engineering Excellence</span>
+                    <h2 class="section-title">The CHRONOS Standard</h2>
+                </div>
+            </div>
+            <div class="row g-4">
+                <div class="col-md-3 col-sm-6" data-aos="fade-up" data-aos-delay="100">
+                    <div class="feature-card">
+                        <i class="fas fa-cog feature-icon"></i>
+                        <h4 class="text-white mb-3">Swiss Movement</h4>
+                        <p class="mb-0">Unyielding precision powered by world-renowned Swiss automated mechanics.</p>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6" data-aos="fade-up" data-aos-delay="200">
+                    <div class="feature-card">
+                        <i class="fas fa-gem feature-icon"></i>
+                        <h4 class="text-white mb-3">Sapphire Glass</h4>
+                        <p class="mb-0">Scratch-resistant crystal ensuring your watch face remains pristine forever.</p>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6" data-aos="fade-up" data-aos-delay="300">
+                    <div class="feature-card">
+                        <i class="fas fa-water feature-icon"></i>
+                        <h4 class="text-white mb-3">Water Resistant</h4>
+                        <p class="mb-0">Engineered to withstand depths up to 300 meters, perfect for diving.</p>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6" data-aos="fade-up" data-aos-delay="400">
+                    <div class="feature-card">
+                        <i class="fas fa-sync feature-icon"></i>
+                        <h4 class="text-white mb-3">Automatic</h4>
+                        <p class="mb-0">Self-winding mechanism driven by the kinetic motion of your wrist.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Newsletter Section -->
+    <section class="section-padding" style="background: #050505;">
+        <div class="container">
+            <div class="row justify-content-center" data-aos="fade-up">
+                <div class="col-lg-6 text-center">
+                    <h2 class="text-white mb-3">Join The Exclusive Club</h2>
+                    <p class="mb-4">Subscribe to receive updates on new releases, exclusive events, and the art of watchmaking.</p>
+                    <form class="d-flex gap-2">
+                        <input type="email" class="form-control" placeholder="Enter your email address" required>
+                        <button type="submit" class="btn btn-gold text-nowrap">Subscribe</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-lg-4 col-md-6">
+                    <a href="{% url 'home' %}" class="footer-logo">CHRONOS</a>
+                    <p class="pe-lg-4">Crafting luxurious timepieces since 1924. Every watch is a symphony of precision engineering and elegant design.</p>
+                    <div class="social-icons mt-4">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-pinterest"></i></a>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-6">
+                    <h5 class="text-white mb-4">Quick Links</h5>
+                    <div class="footer-links">
+                        <a href="{% url 'home' %}">Home</a>
+                        <a href="{% url 'about' %}">Our Story</a>
+                        <a href="{% url 'collection' %}">Collection</a>
+                        <a href="{% url 'contact' %}">Contact Us</a>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <h5 class="text-white mb-4">Customer Care</h5>
+                    <div class="footer-links">
+                        <a href="#">Shipping Policy</a>
+                        <a href="#">Returns & Exchanges</a>
+                        <a href="#">Warranty</a>
+                        <a href="#">FAQ</a>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <h5 class="text-white mb-4">Contact Info</h5>
+                    <p class="mb-2"><i class="fas fa-map-marker-alt text-gold me-2"></i> 123 Luxury Ave, Geneva, Switzerland</p>
+                    <p class="mb-2"><i class="fas fa-phone text-gold me-2"></i> +41 22 123 45 67</p>
+                    <p class="mb-0"><i class="fas fa-envelope text-gold me-2"></i> contact@chronos.com</p>
+                </div>
+            </div>
+            <div class="row mt-5 pt-4" style="border-top: 1px solid rgba(255,255,255,0.05);">
+                <div class="col-md-6 text-center text-md-start">
+                    <p class="mb-0">&copy; 2026 CHRONOS Watches. All Rights Reserved.</p>
+                </div>
+                <div class="col-md-6 text-center text-md-end mt-3 mt-md-0">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" alt="PayPal" style="height: 20px; margin-left: 10px; opacity: 0.5;">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/a/a4/Mastercard_2019_logo.svg" alt="MasterCard" style="height: 20px; margin-left: 10px; opacity: 0.5;">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/0/04/Visa.svg" alt="Visa" style="height: 20px; margin-left: 10px; opacity: 0.5;">
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="{% static 'js/main.js' %}"></script>
+</body>
+</html>

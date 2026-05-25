@@ -1,0 +1,132 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Failed — CHRONOS Luxury Watches</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <style>
+        :root { --bg-dark: #0B0B0B; --accent-gold: #D4AF37; --card-bg: #1A1A1A; --text-light: #F5F5F5; }
+        body { background: var(--bg-dark); color: var(--text-light); font-family: 'Poppins', sans-serif; }
+        .fail-ring {
+            width: 120px; height: 120px; border-radius: 50%;
+            border: 4px solid #dc3545;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 2rem;
+            animation: shake 0.5s 0.3s ease-in-out;
+        }
+        .fail-ring i { font-size: 3rem; color: #dc3545; }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-8px); }
+            40%, 80% { transform: translateX(8px); }
+        }
+        .error-card {
+            background: var(--card-bg);
+            border: 1px solid rgba(220,53,69,0.25);
+            border-radius: 16px; padding: 2rem;
+        }
+        .btn-gold {
+            background: linear-gradient(135deg, #D4AF37, #B8960C);
+            color: #000; font-weight: 600; border: none;
+            border-radius: 8px; padding: 12px 32px; transition: all 0.3s;
+        }
+        .btn-gold:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(212,175,55,0.35); color: #000; }
+        .btn-outline-gold {
+            border: 1px solid var(--accent-gold); color: var(--accent-gold);
+            background: transparent; border-radius: 8px; padding: 12px 32px; transition: all 0.3s;
+        }
+        .btn-outline-gold:hover { background: rgba(212,175,55,0.1); color: var(--accent-gold); }
+        .navbar { background: rgba(11,11,11,0.95) !important; border-bottom: 1px solid rgba(212,175,55,0.15); }
+        .navbar-brand { color: var(--accent-gold) !important; font-family: 'Playfair Display', serif; font-size: 1.5rem; letter-spacing: 3px; }
+        .divider { border-color: rgba(255,255,255,0.08); }
+    </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg fixed-top">
+    <div class="container">
+        <a class="navbar-brand" href="{% url 'home' %}">CHRONOS</a>
+    </div>
+</nav>
+
+<div class="container" style="padding-top: 120px; padding-bottom: 80px;">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+
+            <!-- Failure Header -->
+            <div class="text-center mb-5">
+                <div class="fail-ring">
+                    <i class="fas fa-times"></i>
+                </div>
+                <h1 class="text-white mb-2" style="font-family:'Playfair Display',serif; font-size:2.5rem;">
+                    Payment Failed
+                </h1>
+                <p class="text-secondary fs-5">
+                    We were unable to process your payment.
+                </p>
+            </div>
+
+            <!-- Error Card -->
+            <div class="error-card mb-4">
+                <div class="d-flex align-items-start gap-3 mb-4">
+                    <div style="width:40px;height:40px;border-radius:50%;background:rgba(220,53,69,0.15);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                        <i class="fas fa-exclamation-triangle text-danger"></i>
+                    </div>
+                    <div>
+                        <h6 class="text-white mb-1">Error Details</h6>
+                        <p class="text-secondary mb-0" style="font-size:0.9rem;">{{ error }}</p>
+                    </div>
+                </div>
+
+                {% if order %}
+                <hr class="divider">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <p class="text-secondary small mb-1">Order Reference</p>
+                        <p class="text-white mb-0">#{{ order.id }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p class="text-secondary small mb-1">Amount</p>
+                        <p class="text-white mb-0">₹{{ order.total_amount }}</p>
+                    </div>
+                </div>
+                {% endif %}
+
+                <hr class="divider">
+
+                <div class="p-3 rounded" style="background:rgba(212,175,55,0.05);border:1px solid rgba(212,175,55,0.1);">
+                    <p class="text-secondary small mb-0">
+                        <i class="fas fa-info-circle me-2" style="color:var(--accent-gold);"></i>
+                        No amount has been deducted from your account. You can safely retry the payment.
+                    </p>
+                </div>
+            </div>
+
+            <!-- CTA Buttons -->
+            <div class="d-flex flex-column flex-sm-row gap-3 justify-content-center">
+                <a href="{% url 'checkout' %}" class="btn btn-gold">
+                    <i class="fas fa-redo me-2"></i>Retry Payment
+                </a>
+                <a href="{% url 'cart' %}" class="btn btn-outline-gold">
+                    <i class="fas fa-shopping-bag me-2"></i>Back to Cart
+                </a>
+            </div>
+
+            <!-- Help Text -->
+            <p class="text-center text-secondary mt-4" style="font-size:0.85rem;">
+                Need help? <a href="{% url 'contact' %}" style="color:var(--accent-gold);">Contact our support team</a>
+            </p>
+
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

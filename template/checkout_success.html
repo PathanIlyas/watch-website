@@ -1,0 +1,10 @@
+{% extends 'index.html' %}
+{% load static %}
+{% block content %}
+<div class="container section-padding mt-5 pt-5 text-center">
+    <i class="fas fa-check-circle text-success" style="font-size: 5rem; margin-bottom: 20px;"></i>
+    <h2 class="text-white mb-3">Order Placed Successfully!</h2>
+    <p class="text-secondary mb-4">Thank you for your purchase. Your order #{{ order.id }} has been confirmed.</p>
+    <a href="{% url 'home' %}" class="btn btn-gold">Return to Home</a>
+</div>
+{% endblock %}

@@ -1,0 +1,268 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact — CHRONOS | Luxury Watches</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <style>
+    :root{--bg:#0B0B0B;--gold:#D4AF37;--card:#1A1A1A;--text:#F5F5F5;--muted:#A0A0A0;}
+    body{background:var(--bg);color:var(--text);font-family:'Poppins',sans-serif;}
+    .navbar{background:rgba(11,11,11,.95)!important;backdrop-filter:blur(20px);border-bottom:1px solid rgba(212,175,55,.15);}
+    .navbar-brand{color:var(--gold)!important;font-family:'Playfair Display',serif;font-size:1.5rem;letter-spacing:3px;}
+    .nav-link{color:rgba(245,245,245,.8)!important;font-size:.85rem;letter-spacing:1px;text-transform:uppercase;transition:color .3s;}
+    .nav-link:hover,.nav-link.active{color:var(--gold)!important;}
+    .page-header{padding:130px 0 70px;background:linear-gradient(180deg,rgba(212,175,55,.06) 0%,transparent 100%);border-bottom:1px solid rgba(212,175,55,.1);}
+    .page-header h1{font-family:'Playfair Display',serif;}
+    .section-subtitle{font-size:.75rem;letter-spacing:4px;text-transform:uppercase;color:var(--gold);display:block;margin-bottom:12px;}
+
+    /* Form */
+    .glass-card{background:rgba(26,26,26,.8);backdrop-filter:blur(20px);border:1px solid rgba(212,175,55,.15);border-radius:20px;padding:2.5rem;}
+    .form-control,.form-select{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:var(--text);border-radius:10px;padding:14px 18px;transition:all .3s;font-size:.9rem;}
+    .form-control:focus,.form-select:focus{background:rgba(212,175,55,.05);border-color:var(--gold);color:var(--text);box-shadow:0 0 0 3px rgba(212,175,55,.1);outline:none;}
+    .form-control::placeholder{color:rgba(245,245,245,.3);}
+    .form-select option{background:#1a1a1a;color:var(--text);}
+    .btn-gold{background:linear-gradient(135deg,#D4AF37,#B8960C);color:#000;font-weight:700;border:none;border-radius:10px;padding:15px 32px;letter-spacing:1px;text-transform:uppercase;transition:all .3s;}
+    .btn-gold:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(212,175,55,.4);color:#000;}
+    .text-gold{color:var(--gold);}
+
+    /* Info cards */
+    .info-card{background:rgba(255,255,255,.03);border:1px solid rgba(212,175,55,.12);border-radius:14px;padding:20px 22px;transition:all .3s;}
+    .info-card:hover{border-color:rgba(212,175,55,.3);background:rgba(212,175,55,.04);}
+    .info-icon{width:48px;height:48px;border-radius:12px;background:rgba(212,175,55,.1);border:1px solid rgba(212,175,55,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+
+    /* Toast */
+    .toast-container{position:fixed;top:90px;right:20px;z-index:9999;}
+    .toast{background:var(--card);border:1px solid rgba(212,175,55,.3);color:var(--text);border-radius:10px;}
+    .toast-header{background:transparent;color:var(--gold);border-bottom:1px solid rgba(255,255,255,.07);}
+
+    /* Footer */
+    footer{background:#0a0a0a;border-top:1px solid rgba(255,255,255,.05);padding:40px 0;}
+    .footer-brand{font-family:'Playfair Display',serif;font-size:1.4rem;letter-spacing:3px;color:var(--gold);}
+    .social-link{width:38px;height:38px;border-radius:50%;border:1px solid rgba(212,175,55,.25);display:inline-flex;align-items:center;justify-content:center;color:var(--muted);transition:all .3s;text-decoration:none;}
+    .social-link:hover{border-color:var(--gold);color:var(--gold);background:rgba(212,175,55,.08);}
+  </style>
+</head>
+<body>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toastContainer">
+  {% if messages %}
+    {% for message in messages %}
+    <div class="toast show mb-2" role="alert">
+      <div class="toast-header">
+        <i class="fas fa-{% if message.tags == 'error' %}exclamation-circle text-danger{% else %}check-circle text-success{% endif %} me-2"></i>
+        <strong class="me-auto">{% if message.tags == 'error' %}Error{% else %}Message Sent{% endif %}</strong>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+      </div>
+      <div class="toast-body">{{ message }}</div>
+    </div>
+    {% endfor %}
+  {% endif %}
+</div>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg fixed-top">
+  <div class="container">
+    <a class="navbar-brand" href="{% url 'home' %}">CHRONOS</a>
+    <button class="navbar-toggler shadow-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <i class="fas fa-bars text-white fs-5"></i>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav mx-auto">
+        <li class="nav-item"><a class="nav-link" href="{% url 'home' %}">Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'collection' %}">Collection</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'about' %}">Story</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'track_order' %}">Track Order</a></li>
+        <li class="nav-item"><a class="nav-link active" href="{% url 'contact' %}">Contact</a></li>
+      </ul>
+      <div class="d-flex align-items-center gap-3">
+        <a href="{% url 'cart' %}" class="nav-link position-relative">
+          <i class="fas fa-shopping-bag fs-5"></i>
+          <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill" style="background:var(--gold);color:#000;font-size:.65rem;">{{ cart_count|default:"0" }}</span>
+        </a>
+        {% if user.is_authenticated %}
+          <a href="{% url 'profile' %}" class="nav-link d-flex align-items-center gap-2" style="color:var(--gold)!important;">
+            <i class="fas fa-user-circle fs-5"></i>
+            <span class="d-none d-lg-inline" style="font-size:.8rem;letter-spacing:1px;text-transform:uppercase;">{{ user.first_name|default:user.username }}</span>
+          </a>
+          <a href="{% url 'logout' %}" class="nav-link" style="font-size:.8rem;letter-spacing:1px;text-transform:uppercase;color:rgba(245,245,245,.6)!important;">
+            <i class="fas fa-sign-out-alt me-1"></i>Logout
+          </a>
+        {% else %}
+          <a href="{% url 'login' %}" class="nav-link" style="font-size:.8rem;letter-spacing:1px;text-transform:uppercase;">
+            <i class="fas fa-sign-in-alt me-1"></i>Login
+          </a>
+          <a href="{% url 'register' %}" class="nav-link px-3 py-1 rounded" style="font-size:.8rem;letter-spacing:1px;text-transform:uppercase;background:linear-gradient(135deg,#D4AF37,#B8960C);color:#000!important;font-weight:700;">
+            Register
+          </a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- Page Header -->
+<div class="page-header">
+  <div class="container">
+    <span class="section-subtitle">Get In Touch</span>
+    <h1 class="text-white mb-2">Contact Our Concierge</h1>
+    <p class="text-secondary mb-0">Our dedicated team responds within 24 hours</p>
+  </div>
+</div>
+
+<!-- Contact Section -->
+<section style="padding:70px 0 100px;">
+  <div class="container">
+    <div class="row g-5">
+
+      <!-- Left: Info -->
+      <div class="col-lg-4" data-aos="fade-right">
+        <h3 class="text-white mb-2" style="font-family:'Playfair Display',serif;">Concierge Services</h3>
+        <p class="text-secondary mb-5" style="font-size:.95rem;line-height:1.8;">Our dedicated concierge team is at your disposal to assist with enquiries, arrange private viewings, or help you find the perfect timepiece.</p>
+
+        <div class="d-flex flex-column gap-3 mb-5">
+          <div class="info-card d-flex align-items-center gap-3">
+            <div class="info-icon"><i class="fas fa-map-marker-alt" style="color:var(--gold);"></i></div>
+            <div>
+              <p class="text-white mb-0 fw-500" style="font-size:.9rem;">Geneva Boutique</p>
+              <p class="text-secondary mb-0" style="font-size:.82rem;">123 Luxury Ave, Geneva, Switzerland</p>
+            </div>
+          </div>
+          <div class="info-card d-flex align-items-center gap-3">
+            <div class="info-icon"><i class="fas fa-phone" style="color:var(--gold);"></i></div>
+            <div>
+              <p class="text-white mb-0 fw-500" style="font-size:.9rem;">Telephone</p>
+              <p class="text-secondary mb-0" style="font-size:.82rem;">+41 22 123 45 67</p>
+            </div>
+          </div>
+          <div class="info-card d-flex align-items-center gap-3">
+            <div class="info-icon"><i class="fas fa-envelope" style="color:var(--gold);"></i></div>
+            <div>
+              <p class="text-white mb-0 fw-500" style="font-size:.9rem;">Email</p>
+              <p class="text-secondary mb-0" style="font-size:.82rem;">concierge@chronos.com</p>
+            </div>
+          </div>
+          <div class="info-card d-flex align-items-center gap-3">
+            <div class="info-icon"><i class="fas fa-clock" style="color:var(--gold);"></i></div>
+            <div>
+              <p class="text-white mb-0 fw-500" style="font-size:.9rem;">Business Hours</p>
+              <p class="text-secondary mb-0" style="font-size:.82rem;">Mon–Sat: 9:00 AM – 7:00 PM</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Track Order CTA -->
+        <div class="p-4 rounded-3" style="background:rgba(212,175,55,.06);border:1px solid rgba(212,175,55,.15);">
+          <p class="text-white mb-1 fw-500"><i class="fas fa-map-marker-alt me-2" style="color:var(--gold);"></i>Track Your Order</p>
+          <p class="text-secondary mb-3" style="font-size:.85rem;">Check the real-time status of your timepiece delivery.</p>
+          <a href="{% url 'track_order' %}" class="btn btn-sm" style="background:rgba(212,175,55,.15);color:var(--gold);border:1px solid rgba(212,175,55,.3);border-radius:8px;padding:8px 20px;font-size:.85rem;text-decoration:none;">
+            Track Order →
+          </a>
+        </div>
+      </div>
+
+      <!-- Right: Form -->
+      <div class="col-lg-8" data-aos="fade-left">
+        <div class="glass-card">
+          <h3 class="text-white mb-1" style="font-family:'Playfair Display',serif;">Send a Message</h3>
+          <p class="text-secondary mb-4" style="font-size:.9rem;">We will respond to your enquiry within 24 business hours.</p>
+
+          <form method="post" id="contactForm" novalidate>
+            {% csrf_token %}
+            <div class="row g-4">
+              <div class="col-md-6">
+                <label class="form-label" style="color:rgba(245,245,245,.6);font-size:.78rem;letter-spacing:.5px;text-transform:uppercase;">Full Name *</label>
+                <input type="text" name="name" class="form-control" placeholder="John Doe" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label" style="color:rgba(245,245,245,.6);font-size:.78rem;letter-spacing:.5px;text-transform:uppercase;">Email Address *</label>
+                <input type="email" name="email" class="form-control" placeholder="john@example.com" required>
+              </div>
+              <div class="col-12">
+                <label class="form-label" style="color:rgba(245,245,245,.6);font-size:.78rem;letter-spacing:.5px;text-transform:uppercase;">Subject</label>
+                <select class="form-select" name="subject">
+                  <option value="" disabled selected>Select a subject</option>
+                  <option value="Purchase Inquiry">Purchase Inquiry</option>
+                  <option value="Order Tracking">Order Tracking</option>
+                  <option value="Service & Repair">Service &amp; Repair</option>
+                  <option value="Book a Private Viewing">Book a Private Viewing</option>
+                  <option value="Returns & Exchanges">Returns &amp; Exchanges</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+              <div class="col-12">
+                <label class="form-label" style="color:rgba(245,245,245,.6);font-size:.78rem;letter-spacing:.5px;text-transform:uppercase;">Message *</label>
+                <textarea name="message" class="form-control" rows="6"
+                          placeholder="Tell us how we can assist you..." required></textarea>
+              </div>
+              <div class="col-12">
+                <button type="submit" class="btn btn-gold w-100" id="submitBtn">
+                  <span id="btnText"><i class="fas fa-paper-plane me-2"></i>Send Message</span>
+                  <span id="btnSpinner" class="d-none">
+                    <span class="spinner-border spinner-border-sm me-2" role="status"></span>Sending...
+                  </span>
+                </button>
+              </div>
+              <div class="col-12">
+                <div class="d-flex align-items-center gap-2" style="color:rgba(245,245,245,.35);font-size:.78rem;">
+                  <i class="fas fa-lock" style="color:var(--gold);"></i>
+                  Your information is secure and will never be shared with third parties.
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer>
+  <div class="container">
+    <div class="row g-4 align-items-center">
+      <div class="col-md-4">
+        <div class="footer-brand mb-2">CHRONOS</div>
+        <p class="text-secondary mb-0" style="font-size:.82rem;">Precision · Elegance · Legacy</p>
+      </div>
+      <div class="col-md-4 text-center">
+        <div class="d-flex justify-content-center gap-3">
+          <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+          <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
+          <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+          <a href="#" class="social-link"><i class="fab fa-youtube"></i></a>
+        </div>
+      </div>
+      <div class="col-md-4 text-md-end">
+        <p class="text-secondary mb-0" style="font-size:.82rem;">&copy; 2026 CHRONOS Watches. All Rights Reserved.</p>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+  AOS.init({ duration: 800, once: true });
+
+  // Auto-dismiss toasts
+  document.querySelectorAll('.toast').forEach(t => {
+    setTimeout(() => { const b = bootstrap.Toast.getOrCreateInstance(t); b.hide(); }, 5000);
+  });
+
+  // Loading state on submit
+  document.getElementById('contactForm').addEventListener('submit', function() {
+    document.getElementById('btnText').classList.add('d-none');
+    document.getElementById('btnSpinner').classList.remove('d-none');
+    document.getElementById('submitBtn').disabled = true;
+  });
+</script>
+</body>
+</html>

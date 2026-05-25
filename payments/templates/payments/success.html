@@ -1,0 +1,264 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Confirmed — CHRONOS Luxury Watches</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <style>
+        :root {
+            --bg-dark: #0B0B0B;
+            --accent-gold: #D4AF37;
+            --card-bg: #1A1A1A;
+            --text-light: #F5F5F5;
+        }
+        body { background: var(--bg-dark); color: var(--text-light); font-family: 'Poppins', sans-serif; }
+
+        /* ── Success animation ── */
+        .success-ring {
+            width: 120px; height: 120px;
+            border-radius: 50%;
+            border: 4px solid var(--accent-gold);
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 2rem;
+            animation: pulse-ring 1.5s ease-out infinite;
+            position: relative;
+        }
+        .success-ring i { font-size: 3rem; color: var(--accent-gold); animation: pop-in 0.6s 0.3s both; }
+        @keyframes pulse-ring {
+            0%   { box-shadow: 0 0 0 0 rgba(212,175,55,0.4); }
+            70%  { box-shadow: 0 0 0 20px rgba(212,175,55,0); }
+            100% { box-shadow: 0 0 0 0 rgba(212,175,55,0); }
+        }
+        @keyframes pop-in {
+            from { transform: scale(0); opacity: 0; }
+            to   { transform: scale(1); opacity: 1; }
+        }
+
+        .order-card {
+            background: var(--card-bg);
+            border: 1px solid rgba(212,175,55,0.2);
+            border-radius: 16px;
+            padding: 2rem;
+        }
+        .order-card h5 { color: var(--accent-gold); font-family: 'Playfair Display', serif; }
+        .divider { border-color: rgba(255,255,255,0.08); }
+        .badge-status {
+            background: rgba(212,175,55,0.15);
+            color: var(--accent-gold);
+            border: 1px solid rgba(212,175,55,0.3);
+            border-radius: 20px;
+            padding: 4px 14px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        .badge-cod {
+            background: rgba(40,167,69,0.15);
+            color: #28a745;
+            border: 1px solid rgba(40,167,69,0.3);
+        }
+        .product-row { border-bottom: 1px solid rgba(255,255,255,0.06); padding: 12px 0; }
+        .product-row:last-child { border-bottom: none; }
+        .product-img {
+            width: 56px; height: 56px;
+            object-fit: cover; border-radius: 8px;
+            border: 1px solid rgba(212,175,55,0.2);
+        }
+        .btn-gold {
+            background: linear-gradient(135deg, #D4AF37, #B8960C);
+            color: #000; font-weight: 600; border: none;
+            border-radius: 8px; padding: 12px 32px;
+            transition: all 0.3s;
+        }
+        .btn-gold:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(212,175,55,0.35); color: #000; }
+        .btn-outline-gold {
+            border: 1px solid var(--accent-gold); color: var(--accent-gold);
+            background: transparent; border-radius: 8px; padding: 12px 32px;
+            transition: all 0.3s;
+        }
+        .btn-outline-gold:hover { background: rgba(212,175,55,0.1); color: var(--accent-gold); }
+        .text-gold { color: var(--accent-gold); }
+        .navbar { background: rgba(11,11,11,0.95) !important; border-bottom: 1px solid rgba(212,175,55,0.15); }
+        .navbar-brand { color: var(--accent-gold) !important; font-family: 'Playfair Display', serif; font-size: 1.5rem; letter-spacing: 3px; }
+        .confetti-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 9999; overflow: hidden; }
+        .confetti-piece {
+            position: absolute; width: 10px; height: 10px;
+            top: -10px; opacity: 0;
+            animation: confetti-fall 3s ease-in forwards;
+        }
+        @keyframes confetti-fall {
+            0%   { transform: translateY(0) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Confetti -->
+<div class="confetti-container" id="confettiContainer"></div>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg fixed-top">
+    <div class="container">
+        <a class="navbar-brand" href="{% url 'home' %}">CHRONOS</a>
+    </div>
+</nav>
+
+<div class="container" style="padding-top: 120px; padding-bottom: 80px;">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+
+            <!-- Success Header -->
+            <div class="text-center mb-5">
+                <div class="success-ring">
+                    <i class="fas fa-check"></i>
+                </div>
+                <h1 class="text-white mb-2" style="font-family:'Playfair Display',serif; font-size:2.5rem;">
+                    Order Confirmed
+                </h1>
+                <p class="text-secondary fs-5">
+                    Thank you, <strong class="text-white">{{ order.first_name }}</strong>.
+                    Your timepiece is on its way.
+                </p>
+            </div>
+
+            <!-- Order Summary Card -->
+            <div class="order-card mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="mb-0">Order #{{ order.id }}</h5>
+                    {% if is_cod %}
+                        <span class="badge-status badge-cod">Cash on Delivery</span>
+                    {% else %}
+                        <span class="badge-status">Payment Successful</span>
+                    {% endif %}
+                </div>
+                <hr class="divider">
+
+                <!-- Customer Details -->
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <p class="text-secondary small mb-1">Customer</p>
+                        <p class="text-white mb-0 fw-500">{{ order.first_name }} {{ order.last_name }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p class="text-secondary small mb-1">Email</p>
+                        <p class="text-white mb-0">{{ order.email }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p class="text-secondary small mb-1">Phone</p>
+                        <p class="text-white mb-0">{{ order.phone }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p class="text-secondary small mb-1">Order Date</p>
+                        <p class="text-white mb-0">{{ order.created_at|date:"d M Y, H:i" }}</p>
+                    </div>
+                    <div class="col-12">
+                        <p class="text-secondary small mb-1">Shipping Address</p>
+                        <p class="text-white mb-0">{{ order.address }}, {{ order.city }}, {{ order.state }} {{ order.postal_code }}, {{ order.country }}</p>
+                    </div>
+                </div>
+
+                <hr class="divider">
+
+                <!-- Payment Details -->
+                {% if rz_payment and not is_cod %}
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <p class="text-secondary small mb-1">Razorpay Order ID</p>
+                        <p class="text-white mb-0" style="font-size:0.85rem; word-break:break-all;">{{ rz_payment.razorpay_order_id }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p class="text-secondary small mb-1">Payment ID</p>
+                        <p class="text-white mb-0" style="font-size:0.85rem; word-break:break-all;">{{ rz_payment.razorpay_payment_id|default:"—" }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p class="text-secondary small mb-1">Payment Method</p>
+                        <p class="text-white mb-0">Razorpay</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p class="text-secondary small mb-1">Payment Status</p>
+                        <p class="text-gold mb-0 fw-600">{{ rz_payment.get_status_display }}</p>
+                    </div>
+                </div>
+                <hr class="divider">
+                {% endif %}
+
+                <!-- Ordered Products -->
+                <h5 class="mb-3">Items Ordered</h5>
+                {% for item in items %}
+                <div class="product-row d-flex align-items-center gap-3">
+                    {% if item.watch.images.first %}
+                        <img src="{{ item.watch.images.first.image.url }}" alt="{{ item.watch.name }}" class="product-img">
+                    {% else %}
+                        <div class="product-img d-flex align-items-center justify-content-center" style="background:#2a2a2a;">
+                            <i class="fas fa-clock text-secondary"></i>
+                        </div>
+                    {% endif %}
+                    <div class="flex-grow-1">
+                        <p class="text-white mb-0 fw-500">{{ item.watch.name }}</p>
+                        <p class="text-secondary small mb-0">{{ item.watch.brand }} &bull; Qty: {{ item.quantity }}</p>
+                    </div>
+                    <span class="text-gold fw-600">₹{{ item.price }}</span>
+                </div>
+                {% empty %}
+                <p class="text-secondary">No items found.</p>
+                {% endfor %}
+
+                <hr class="divider mt-3">
+
+                <!-- Totals -->
+                <div class="d-flex justify-content-between text-secondary mb-2">
+                    <span>Subtotal</span><span class="text-white">₹{{ order.total_amount }}</span>
+                </div>
+                <div class="d-flex justify-content-between text-secondary mb-2">
+                    <span>Shipping</span><span class="text-white">Complimentary</span>
+                </div>
+                <div class="d-flex justify-content-between align-items-center mt-3">
+                    <span class="text-white fs-5 fw-600">Total Paid</span>
+                    <span class="text-gold fs-4 fw-700">₹{{ order.total_amount }}</span>
+                </div>
+            </div>
+
+            <!-- CTA Buttons -->
+            <div class="d-flex flex-column flex-sm-row gap-3 justify-content-center">
+                <a href="{% url 'collection' %}" class="btn btn-gold">
+                    <i class="fas fa-shopping-bag me-2"></i>Continue Shopping
+                </a>
+                <a href="{% url 'home' %}" class="btn btn-outline-gold">
+                    <i class="fas fa-home me-2"></i>Back to Home
+                </a>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Confetti burst on load
+    (function() {
+        const colors = ['#D4AF37', '#FFD700', '#FFF', '#B8960C', '#F5F5F5'];
+        const container = document.getElementById('confettiContainer');
+        for (let i = 0; i < 80; i++) {
+            const piece = document.createElement('div');
+            piece.className = 'confetti-piece';
+            piece.style.cssText = `
+                left: ${Math.random() * 100}%;
+                background: ${colors[Math.floor(Math.random() * colors.length)]};
+                width: ${Math.random() * 10 + 5}px;
+                height: ${Math.random() * 10 + 5}px;
+                border-radius: ${Math.random() > 0.5 ? '50%' : '0'};
+                animation-delay: ${Math.random() * 2}s;
+                animation-duration: ${Math.random() * 2 + 2}s;
+            `;
+            container.appendChild(piece);
+        }
+        setTimeout(() => container.remove(), 5000);
+    })();
+</script>
+</body>
+</html>

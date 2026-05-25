@@ -1,0 +1,140 @@
+{% extends 'dashboard/base.html' %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h4 class="mb-1">Payment Management</h4>
+        <p class="text-muted mb-0" style="font-size:0.85rem;">All Razorpay transactions and payment records</p>
+    </div>
+</div>
+
+<!-- Analytics Cards -->
+<div class="row g-4 mb-5">
+    <div class="col-md-3">
+        <div class="glass-card">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div class="text-muted text-uppercase" style="font-size:0.8rem;letter-spacing:1px;">Total Revenue</div>
+                <i class="fas fa-rupee-sign" style="color:var(--accent-gold);font-size:1.2rem;"></i>
+            </div>
+            <h3 class="mb-0">₹{{ total_paid|default:"0" }}</h3>
+            <div class="mt-2 text-success" style="font-size:0.85rem;"><i class="fas fa-check-circle"></i> Verified payments</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="glass-card">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div class="text-muted text-uppercase" style="font-size:0.8rem;letter-spacing:1px;">Successful</div>
+                <i class="fas fa-check-circle" style="color:#28a745;font-size:1.2rem;"></i>
+            </div>
+            <h3 class="mb-0 text-success">{{ payments|length }}</h3>
+            <div class="mt-2 text-muted" style="font-size:0.85rem;">Total: {{ total_count }} transactions</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="glass-card">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div class="text-muted text-uppercase" style="font-size:0.8rem;letter-spacing:1px;">Failed</div>
+                <i class="fas fa-times-circle" style="color:#dc3545;font-size:1.2rem;"></i>
+            </div>
+            <h3 class="mb-0 text-danger">{{ total_failed }}</h3>
+            <div class="mt-2 text-muted" style="font-size:0.85rem;">Requires attention</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="glass-card">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div class="text-muted text-uppercase" style="font-size:0.8rem;letter-spacing:1px;">Pending</div>
+                <i class="fas fa-clock" style="color:var(--accent-gold);font-size:1.2rem;"></i>
+            </div>
+            <h3 class="mb-0" style="color:var(--accent-gold);">{{ total_created }}</h3>
+            <div class="mt-2 text-muted" style="font-size:0.85rem;">Awaiting completion</div>
+        </div>
+    </div>
+</div>
+
+<!-- Filter Bar -->
+<div class="glass-card mb-4">
+    <form method="get" class="d-flex gap-3 align-items-center flex-wrap">
+        <label class="text-muted" style="font-size:0.85rem;">Filter by Status:</label>
+        <a href="?status=" class="btn btn-sm {% if not status_filter %}btn-warning{% else %}btn-outline-secondary{% endif %} text-dark rounded-pill px-3">All</a>
+        <a href="?status=paid" class="btn btn-sm {% if status_filter == 'paid' %}btn-success{% else %}btn-outline-secondary{% endif %} rounded-pill px-3">Paid</a>
+        <a href="?status=failed" class="btn btn-sm {% if status_filter == 'failed' %}btn-danger{% else %}btn-outline-secondary{% endif %} rounded-pill px-3">Failed</a>
+        <a href="?status=created" class="btn btn-sm {% if status_filter == 'created' %}btn-warning text-dark{% else %}btn-outline-secondary{% endif %} rounded-pill px-3">Created</a>
+        <a href="?status=attempted" class="btn btn-sm {% if status_filter == 'attempted' %}btn-info text-dark{% else %}btn-outline-secondary{% endif %} rounded-pill px-3">Attempted</a>
+    </form>
+</div>
+
+<!-- Payments Table -->
+<div class="glass-card">
+    <div class="table-responsive">
+        <table class="table table-dark table-borderless align-middle">
+            <thead>
+                <tr>
+                    <th>Order</th>
+                    <th>Customer</th>
+                    <th>Razorpay Order ID</th>
+                    <th>Payment ID</th>
+                    <th>Amount</th>
+                    <th>Method</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for payment in payments %}
+                <tr>
+                    <td>
+                        <a href="{% url 'dashboard_order_update' payment.order.id %}" style="color:var(--accent-gold);text-decoration:none;">
+                            #{{ payment.order.id }}
+                        </a>
+                    </td>
+                    <td>
+                        <div>{{ payment.order.first_name }} {{ payment.order.last_name }}</div>
+                        <div class="text-muted" style="font-size:0.8rem;">{{ payment.order.email }}</div>
+                    </td>
+                    <td>
+                        <code style="color:#94A3B8;font-size:0.78rem;">{{ payment.razorpay_order_id }}</code>
+                    </td>
+                    <td>
+                        {% if payment.razorpay_payment_id %}
+                            <code style="color:#94A3B8;font-size:0.78rem;">{{ payment.razorpay_payment_id }}</code>
+                        {% else %}
+                            <span class="text-muted">—</span>
+                        {% endif %}
+                    </td>
+                    <td class="fw-bold">₹{{ payment.amount }}</td>
+                    <td>
+                        <span class="badge rounded-pill" style="background:rgba(212,175,55,0.15);color:var(--accent-gold);border:1px solid rgba(212,175,55,0.3);">
+                            {{ payment.payment_method }}
+                        </span>
+                    </td>
+                    <td>
+                        {% if payment.status == 'paid' %}
+                            <span class="badge rounded-pill badge-green"><i class="fas fa-check me-1"></i>Paid</span>
+                        {% elif payment.status == 'failed' %}
+                            <span class="badge rounded-pill badge-red"><i class="fas fa-times me-1"></i>Failed</span>
+                        {% elif payment.status == 'created' %}
+                            <span class="badge rounded-pill badge-gold"><i class="fas fa-clock me-1"></i>Created</span>
+                        {% elif payment.status == 'attempted' %}
+                            <span class="badge rounded-pill" style="background:rgba(23,162,184,0.2);color:#17a2b8;"><i class="fas fa-spinner me-1"></i>Attempted</span>
+                        {% elif payment.status == 'refunded' %}
+                            <span class="badge rounded-pill" style="background:rgba(108,117,125,0.2);color:#6c757d;"><i class="fas fa-undo me-1"></i>Refunded</span>
+                        {% else %}
+                            <span class="badge rounded-pill badge-gold">{{ payment.status }}</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-muted" style="font-size:0.85rem;">{{ payment.created_at|date:"d M Y" }}<br><span style="font-size:0.75rem;">{{ payment.created_at|date:"H:i" }}</span></td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="8" class="text-center text-muted py-5">
+                        <i class="fas fa-credit-card fa-2x mb-3 d-block" style="color:rgba(255,255,255,0.1);"></i>
+                        No payment records found.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

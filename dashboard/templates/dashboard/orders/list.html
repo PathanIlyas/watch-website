@@ -1,0 +1,108 @@
+{% extends 'dashboard/base.html' %}
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h4 class="mb-1">Orders</h4>
+    <p class="text-muted mb-0" style="font-size:.85rem;">Manage and track all customer orders</p>
+  </div>
+</div>
+
+<!-- Status Filter -->
+<div class="glass-card mb-4">
+  <form method="get" class="d-flex gap-3 align-items-center flex-wrap">
+    <label class="text-muted" style="font-size:.85rem;">Filter:</label>
+    {% with status_filter=request.GET.status %}
+    <a href="?" class="btn btn-sm {% if not status_filter %}btn-warning text-dark{% else %}btn-outline-secondary{% endif %} rounded-pill px-3">All</a>
+    {% for val, label in order_statuses %}
+    <a href="?status={{ val }}"
+       class="btn btn-sm {% if status_filter == val %}btn-warning text-dark{% else %}btn-outline-secondary{% endif %} rounded-pill px-3">
+      {{ label }}
+    </a>
+    {% endfor %}
+    {% endwith %}
+  </form>
+</div>
+
+<div class="glass-card">
+  <div class="table-responsive">
+    <table class="table table-dark table-borderless align-middle mb-0">
+      <thead>
+        <tr>
+          <th style="color:var(--text-muted);font-size:.78rem;text-transform:uppercase;letter-spacing:.5px;">Order</th>
+          <th style="color:var(--text-muted);font-size:.78rem;text-transform:uppercase;letter-spacing:.5px;">Customer</th>
+          <th style="color:var(--text-muted);font-size:.78rem;text-transform:uppercase;letter-spacing:.5px;">Date</th>
+          <th style="color:var(--text-muted);font-size:.78rem;text-transform:uppercase;letter-spacing:.5px;">Total</th>
+          <th style="color:var(--text-muted);font-size:.78rem;text-transform:uppercase;letter-spacing:.5px;">Payment</th>
+          <th style="color:var(--text-muted);font-size:.78rem;text-transform:uppercase;letter-spacing:.5px;">Status</th>
+          <th style="color:var(--text-muted);font-size:.78rem;text-transform:uppercase;letter-spacing:.5px;">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for order in orders %}
+        <tr style="border-bottom:1px solid rgba(255,255,255,.04);">
+          <td>
+            <span class="fw-700" style="color:var(--accent-gold);">#{{ order.id }}</span>
+          </td>
+          <td>
+            <div class="fw-500 text-white" style="font-size:.9rem;">{{ order.first_name }} {{ order.last_name }}</div>
+            <div class="text-muted" style="font-size:.78rem;">{{ order.email }}</div>
+          </td>
+          <td class="text-muted" style="font-size:.85rem;">
+            {{ order.created_at|date:"d M Y" }}<br>
+            <span style="font-size:.75rem;">{{ order.created_at|date:"H:i" }}</span>
+          </td>
+          <td class="fw-700" style="color:var(--accent-gold);">₹{{ order.total_amount }}</td>
+          <td>
+            {% if order.payment %}
+              {% if order.payment.status == 'Completed' %}
+                <span class="badge rounded-pill badge-green">Paid</span>
+              {% elif order.payment.status == 'Pending' %}
+                <span class="badge rounded-pill badge-gold">COD</span>
+              {% else %}
+                <span class="badge rounded-pill badge-red">{{ order.payment.status }}</span>
+              {% endif %}
+            {% else %}
+              <span class="text-muted" style="font-size:.8rem;">—</span>
+            {% endif %}
+          </td>
+          <td>
+            {% if order.status == 'Delivered' %}
+              <span class="badge rounded-pill badge-green">{{ order.get_status_display }}</span>
+            {% elif order.status == 'Cancelled' %}
+              <span class="badge rounded-pill badge-red">{{ order.get_status_display }}</span>
+            {% elif order.status == 'Shipped' or order.status == 'Out for Delivery' %}
+              <span class="badge rounded-pill" style="background:rgba(23,162,184,.2);color:#17a2b8;">{{ order.get_status_display }}</span>
+            {% elif order.status == 'Processing' or order.status == 'Packed' %}
+              <span class="badge rounded-pill" style="background:rgba(111,66,193,.2);color:#a78bfa;">{{ order.get_status_display }}</span>
+            {% else %}
+              <span class="badge rounded-pill badge-gold">{{ order.get_status_display }}</span>
+            {% endif %}
+          </td>
+          <td>
+            <div class="d-flex gap-2">
+              <a href="{% url 'dashboard_order_update' order.pk %}"
+                 class="btn btn-sm rounded-pill px-3"
+                 style="background:rgba(212,175,55,.15);color:var(--accent-gold);border:1px solid rgba(212,175,55,.3);">
+                <i class="fas fa-edit me-1"></i>Manage
+              </a>
+              <a href="{% url 'track_order' %}?order_id={{ order.id }}" target="_blank"
+                 class="btn btn-sm btn-outline-secondary rounded-pill px-3">
+                <i class="fas fa-external-link-alt"></i>
+              </a>
+            </div>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="7" class="text-center text-muted py-5">
+            <i class="fas fa-shopping-bag fa-2x mb-3 d-block" style="color:rgba(255,255,255,.1);"></i>
+            No orders found.
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

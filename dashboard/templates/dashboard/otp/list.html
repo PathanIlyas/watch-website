@@ -1,0 +1,208 @@
+{% extends 'dashboard/base.html' %}
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h4 class="mb-1">OTP & SMS Logs</h4>
+    <p class="text-muted mb-0" style="font-size:.85rem;">Verification analytics and SMS delivery history</p>
+  </div>
+</div>
+
+<!-- Analytics Cards -->
+<div class="row g-4 mb-5">
+  <div class="col-md-4 col-lg-2">
+    <div class="glass-card text-center">
+      <div class="mb-2" style="color:var(--accent-gold);font-size:1.4rem;"><i class="fas fa-paper-plane"></i></div>
+      <h4 class="mb-0 text-white">{{ total_sent }}</h4>
+      <div class="text-muted mt-1" style="font-size:.75rem;text-transform:uppercase;letter-spacing:.5px;">SMS Sent</div>
+    </div>
+  </div>
+  <div class="col-md-4 col-lg-2">
+    <div class="glass-card text-center">
+      <div class="mb-2" style="color:#dc3545;font-size:1.4rem;"><i class="fas fa-times-circle"></i></div>
+      <h4 class="mb-0 text-danger">{{ total_failed }}</h4>
+      <div class="text-muted mt-1" style="font-size:.75rem;text-transform:uppercase;letter-spacing:.5px;">SMS Failed</div>
+    </div>
+  </div>
+  <div class="col-md-4 col-lg-2">
+    <div class="glass-card text-center">
+      <div class="mb-2" style="color:#28a745;font-size:1.4rem;"><i class="fas fa-check-circle"></i></div>
+      <h4 class="mb-0 text-success">{{ total_verified }}</h4>
+      <div class="text-muted mt-1" style="font-size:.75rem;text-transform:uppercase;letter-spacing:.5px;">Verified</div>
+    </div>
+  </div>
+  <div class="col-md-4 col-lg-2">
+    <div class="glass-card text-center">
+      <div class="mb-2" style="color:#ffc107;font-size:1.4rem;"><i class="fas fa-clock"></i></div>
+      <h4 class="mb-0" style="color:#ffc107;">{{ total_expired }}</h4>
+      <div class="text-muted mt-1" style="font-size:.75rem;text-transform:uppercase;letter-spacing:.5px;">Expired</div>
+    </div>
+  </div>
+  <div class="col-md-4 col-lg-2">
+    <div class="glass-card text-center">
+      <div class="mb-2" style="color:#17a2b8;font-size:1.4rem;"><i class="fas fa-ban"></i></div>
+      <h4 class="mb-0" style="color:#17a2b8;">{{ total_blocked }}</h4>
+      <div class="text-muted mt-1" style="font-size:.75rem;text-transform:uppercase;letter-spacing:.5px;">Blocked</div>
+    </div>
+  </div>
+  <div class="col-md-4 col-lg-2">
+    <div class="glass-card text-center">
+      <div class="mb-2" style="color:var(--accent-gold);font-size:1.4rem;"><i class="fas fa-shield-alt"></i></div>
+      <h4 class="mb-0" style="color:var(--accent-gold);">
+        {% if total_sent > 0 %}{{ total_verified|floatformat:0 }}{% else %}0{% endif %}
+      </h4>
+      <div class="text-muted mt-1" style="font-size:.75rem;text-transform:uppercase;letter-spacing:.5px;">Success Rate</div>
+    </div>
+  </div>
+</div>
+
+<!-- Filters -->
+<div class="glass-card mb-4">
+  <form method="get" class="d-flex gap-3 align-items-center flex-wrap">
+    <label class="text-muted" style="font-size:.82rem;">Status:</label>
+    <a href="?purpose={{ purpose_filter }}" class="btn btn-sm {% if not status_filter %}btn-warning text-dark{% else %}btn-outline-secondary{% endif %} rounded-pill px-3">All</a>
+    <a href="?status=pending&purpose={{ purpose_filter }}" class="btn btn-sm {% if status_filter == 'pending' %}btn-warning text-dark{% else %}btn-outline-secondary{% endif %} rounded-pill px-3">Pending</a>
+    <a href="?status=verified&purpose={{ purpose_filter }}" class="btn btn-sm {% if status_filter == 'verified' %}btn-success{% else %}btn-outline-secondary{% endif %} rounded-pill px-3">Verified</a>
+    <a href="?status=expired&purpose={{ purpose_filter }}" class="btn btn-sm {% if status_filter == 'expired' %}btn-warning text-dark{% else %}btn-outline-secondary{% endif %} rounded-pill px-3">Expired</a>
+    <a href="?status=blocked&purpose={{ purpose_filter }}" class="btn btn-sm {% if status_filter == 'blocked' %}btn-danger{% else %}btn-outline-secondary{% endif %} rounded-pill px-3">Blocked</a>
+    <span class="text-muted ms-3" style="font-size:.82rem;">Purpose:</span>
+    <a href="?status={{ status_filter }}" class="btn btn-sm {% if not purpose_filter %}btn-warning text-dark{% else %}btn-outline-secondary{% endif %} rounded-pill px-3">All</a>
+    <a href="?status={{ status_filter }}&purpose=login" class="btn btn-sm {% if purpose_filter == 'login' %}btn-info text-dark{% else %}btn-outline-secondary{% endif %} rounded-pill px-3">Login</a>
+    <a href="?status={{ status_filter }}&purpose=register" class="btn btn-sm {% if purpose_filter == 'register' %}btn-info text-dark{% else %}btn-outline-secondary{% endif %} rounded-pill px-3">Register</a>
+    <a href="?status={{ status_filter }}&purpose=checkout" class="btn btn-sm {% if purpose_filter == 'checkout' %}btn-info text-dark{% else %}btn-outline-secondary{% endif %} rounded-pill px-3">Checkout</a>
+  </form>
+</div>
+
+<div class="row g-4">
+  <!-- OTP Records -->
+  <div class="col-lg-8">
+    <div class="glass-card">
+      <h5 class="mb-4" style="color:var(--accent-gold);"><i class="fas fa-key me-2"></i>OTP Verification Records</h5>
+      <div class="table-responsive">
+        <table class="table table-dark table-borderless align-middle mb-0">
+          <thead>
+            <tr>
+              <th style="color:var(--text-muted);font-size:.75rem;text-transform:uppercase;letter-spacing:.5px;">Phone</th>
+              <th style="color:var(--text-muted);font-size:.75rem;text-transform:uppercase;letter-spacing:.5px;">Purpose</th>
+              <th style="color:var(--text-muted);font-size:.75rem;text-transform:uppercase;letter-spacing:.5px;">Status</th>
+              <th style="color:var(--text-muted);font-size:.75rem;text-transform:uppercase;letter-spacing:.5px;">Attempts</th>
+              <th style="color:var(--text-muted);font-size:.75rem;text-transform:uppercase;letter-spacing:.5px;">Created</th>
+              <th style="color:var(--text-muted);font-size:.75rem;text-transform:uppercase;letter-spacing:.5px;">Expires</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for otp in otps %}
+            <tr style="border-bottom:1px solid rgba(255,255,255,.04);">
+              <td class="text-white fw-500" style="font-size:.9rem;">{{ otp.phone }}</td>
+              <td>
+                <span class="badge rounded-pill" style="background:rgba(212,175,55,.12);color:var(--accent-gold);border:1px solid rgba(212,175,55,.25);font-size:.75rem;">
+                  {{ otp.get_purpose_display }}
+                </span>
+              </td>
+              <td>
+                {% if otp.status == 'verified' %}
+                  <span class="badge rounded-pill badge-green">Verified</span>
+                {% elif otp.status == 'expired' %}
+                  <span class="badge rounded-pill" style="background:rgba(255,193,7,.15);color:#ffc107;">Expired</span>
+                {% elif otp.status == 'blocked' %}
+                  <span class="badge rounded-pill badge-red">Blocked</span>
+                {% else %}
+                  <span class="badge rounded-pill badge-gold">Pending</span>
+                {% endif %}
+              </td>
+              <td>
+                <span class="{% if otp.attempts >= 3 %}text-danger{% else %}text-white{% endif %}">
+                  {{ otp.attempts }}/5
+                </span>
+              </td>
+              <td class="text-muted" style="font-size:.8rem;">{{ otp.created_at|date:"d M, H:i" }}</td>
+              <td class="text-muted" style="font-size:.8rem;">{{ otp.expires_at|date:"d M, H:i" }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="6" class="text-center text-muted py-5">
+                <i class="fas fa-key fa-2x mb-3 d-block" style="color:rgba(255,255,255,.1);"></i>
+                No OTP records found.
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- SMS Logs -->
+  <div class="col-lg-4">
+    <div class="glass-card">
+      <h5 class="mb-4" style="color:var(--accent-gold);"><i class="fas fa-sms me-2"></i>SMS Delivery Log</h5>
+      <div style="max-height:520px;overflow-y:auto;">
+        {% for log in sms_logs %}
+        <div class="d-flex gap-3 mb-3 pb-3" style="border-bottom:1px solid rgba(255,255,255,.05);">
+          <div style="flex-shrink:0;margin-top:3px;">
+            {% if log.status == 'sent' %}
+              <div style="width:10px;height:10px;border-radius:50%;background:#28a745;"></div>
+            {% else %}
+              <div style="width:10px;height:10px;border-radius:50%;background:#dc3545;"></div>
+            {% endif %}
+          </div>
+          <div style="min-width:0;">
+            <p class="text-white mb-0 fw-500" style="font-size:.85rem;">{{ log.phone }}</p>
+            <p class="text-muted mb-0" style="font-size:.75rem;">{{ log.provider }} · {{ log.get_status_display }}</p>
+            {% if log.error %}
+            <p class="text-danger mb-0" style="font-size:.72rem;word-break:break-word;">{{ log.error|truncatechars:60 }}</p>
+            {% endif %}
+            <p class="text-muted mb-0" style="font-size:.72rem;">{{ log.created_at|date:"d M Y, H:i" }}</p>
+          </div>
+        </div>
+        {% empty %}
+        <div class="text-center text-muted py-4">
+          <i class="fas fa-sms fa-2x mb-2 d-block" style="color:rgba(255,255,255,.1);"></i>
+          No SMS logs yet.
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Provider Config Status -->
+<div class="glass-card mt-4">
+  <h5 class="mb-4" style="color:var(--accent-gold);"><i class="fas fa-cog me-2"></i>SMS Provider Configuration</h5>
+  <div class="row g-3">
+    <div class="col-md-4">
+      <div class="p-3 rounded" style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);">
+        <div class="d-flex align-items-center gap-3 mb-2">
+          <i class="fas fa-bolt" style="color:var(--accent-gold);"></i>
+          <strong class="text-white">Fast2SMS</strong>
+        </div>
+        <p class="text-muted mb-1" style="font-size:.8rem;">Free Indian SMS API</p>
+        <p class="text-muted mb-0" style="font-size:.75rem;">Set <code style="color:var(--accent-gold);">SMS_PROVIDER=fast2sms</code> and <code style="color:var(--accent-gold);">FAST2SMS_API_KEY</code> in .env</p>
+        <a href="https://www.fast2sms.com/dashboard" target="_blank" style="color:var(--accent-gold);font-size:.75rem;">Get API Key →</a>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="p-3 rounded" style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);">
+        <div class="d-flex align-items-center gap-3 mb-2">
+          <i class="fas fa-phone" style="color:#17a2b8;"></i>
+          <strong class="text-white">Twilio</strong>
+        </div>
+        <p class="text-muted mb-1" style="font-size:.8rem;">Global SMS provider</p>
+        <p class="text-muted mb-0" style="font-size:.75rem;">Set <code style="color:var(--accent-gold);">SMS_PROVIDER=twilio</code> and Twilio credentials in .env</p>
+        <a href="https://www.twilio.com/console" target="_blank" style="color:var(--accent-gold);font-size:.75rem;">Twilio Console →</a>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="p-3 rounded" style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);">
+        <div class="d-flex align-items-center gap-3 mb-2">
+          <i class="fas fa-terminal" style="color:#28a745;"></i>
+          <strong class="text-white">Console (Dev)</strong>
+        </div>
+        <p class="text-muted mb-1" style="font-size:.8rem;">Prints OTP to terminal</p>
+        <p class="text-muted mb-0" style="font-size:.75rem;">Default when <code style="color:var(--accent-gold);">SMS_PROVIDER=console</code>. OTP shown on screen in DEBUG mode.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

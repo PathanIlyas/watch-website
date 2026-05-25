@@ -1,0 +1,105 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Story - CHRONOS | Premium Luxury Watches</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg fixed-top scrolled">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'home' %}">CHRONOS</a>
+            <button class="navbar-toggler shadow-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <i class="fas fa-bars text-white fs-3"></i>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav mx-auto">
+                    <li class="nav-item"><a class="nav-link" href="{% url 'home' %}">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'collection' %}">Collection</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="{% url 'about' %}">Story</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'track_order' %}">Track Order</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'contact' %}">Contact</a></li>
+                </ul>
+                <div class="d-flex align-items-center gap-3">
+                    <a href="{% url 'cart' %}" class="nav-link position-relative">
+                        <i class="fas fa-shopping-bag fs-5"></i>
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-gold" style="background-color: var(--accent-gold); color: #000;">{{ cart_count|default:"0" }}</span>
+                    </a>
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'profile' %}" class="nav-link d-flex align-items-center gap-2" style="color:var(--accent-gold)!important;">
+                            <i class="fas fa-user-circle fs-5"></i>
+                            <span class="d-none d-lg-inline" style="font-size:.8rem;letter-spacing:1px;text-transform:uppercase;">{{ user.first_name|default:user.username }}</span>
+                        </a>
+                        <a href="{% url 'logout' %}" class="nav-link" style="font-size:.8rem;letter-spacing:1px;text-transform:uppercase;color:rgba(245,245,245,.6)!important;">
+                            <i class="fas fa-sign-out-alt me-1"></i>Logout
+                        </a>
+                    {% else %}
+                        <a href="{% url 'login' %}" class="nav-link" style="font-size:.8rem;letter-spacing:1px;text-transform:uppercase;">
+                            <i class="fas fa-sign-in-alt me-1"></i>Login
+                        </a>
+                        <a href="{% url 'register' %}" class="nav-link px-3 py-1 rounded" style="font-size:.8rem;letter-spacing:1px;text-transform:uppercase;background:linear-gradient(135deg,#D4AF37,#B8960C);color:#000!important;font-weight:700;">
+                            Register
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <div class="page-header" style="background: linear-gradient(180deg, rgba(11,11,11,0.5) 0%, var(--bg-color) 100%), url('{% static 'images/hero.png' %}'); background-size: cover; background-position: center; background-attachment: fixed; padding: 250px 0 100px;">
+        <div class="container">
+            <span class="section-subtitle">Heritage & Craftsmanship</span>
+            <h1 class="text-white display-4">Our Story</h1>
+        </div>
+    </div>
+
+    <!-- About Content -->
+    <section class="section-padding">
+        <div class="container">
+            <div class="row align-items-center g-5">
+                <div class="col-lg-6" data-aos="fade-right">
+                    <h2 class="section-title text-start" style="text-align: left;">A Century of Excellence</h2>
+                    <p class="mb-4">Founded in 1924 in the heart of Geneva, Switzerland, CHRONOS began as a small atelier dedicated to the pursuit of absolute precision. Our founder, Henri Dubois, believed that a watch was not merely an instrument to tell time, but a companion that holds the moments of a lifetime.</p>
+                    <p>Today, nearly a century later, we continue to uphold his vision. Every CHRONOS timepiece is assembled by hand, requiring hundreds of hours of meticulous labor by our master watchmakers. We blend traditional techniques with avant-garde materials to create watches that are both classic and revolutionary.</p>
+                </div>
+                <div class="col-lg-6" data-aos="fade-left">
+                    <img src="{% static 'images/silver.png' %}" alt="Craftsmanship" class="img-fluid glass-effect p-4 mouse-glow">
+                </div>
+            </div>
+
+            <div class="row align-items-center g-5 mt-5 pt-5 flex-lg-row-reverse">
+                <div class="col-lg-6" data-aos="fade-left">
+                    <h2 class="section-title text-start" style="text-align: left;">The Art of Watchmaking</h2>
+                    <p class="mb-4">Our movements are the heart of our watches. Developed entirely in-house, they are recognized globally for their robustness, accuracy, and beauty. Each component, down to the smallest screw, is polished and decorated by hand.</p>
+                    <p>We source only the finest materials: 18k ethical gold, platinum, and flawless diamonds. Our sapphire crystals are treated with multiple layers of anti-reflective coating to ensure perfect legibility under any condition.</p>
+                </div>
+                <div class="col-lg-6" data-aos="fade-right">
+                    <img src="{% static 'images/black.png' %}" alt="Movements" class="img-fluid glass-effect p-4 mouse-glow">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="row mt-5 pt-4" style="border-top: 1px solid rgba(255,255,255,0.05);">
+                <div class="col-md-6 text-center text-md-start">
+                    <p class="mb-0">&copy; 2026 CHRONOS Watches. All Rights Reserved.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="{% static 'js/main.js' %}"></script>
+</body>
+</html>
