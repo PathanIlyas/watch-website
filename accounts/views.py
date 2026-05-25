@@ -31,9 +31,8 @@ logger = logging.getLogger(__name__)
 User = get_user_model()
 
 
-# ─────────────────────────────────────────────────────────────
 # Helpers
-# ─────────────────────────────────────────────────────────────
+
 def _send_otp(phone, purpose, user=None, ip=None, email=''):
     """Create OTP record and send SMS (with email fallback). Returns (otp_plain, record, result)."""
     otp_plain, record = create_otp_record(phone, purpose, user=user, ip=ip)
@@ -72,9 +71,8 @@ def _is_password_locked(user):
     return user.last_login_attempt >= timezone.now() - timedelta(minutes=lock_minutes)
 
 
-# ─────────────────────────────────────────────────────────────
 # 1. REGISTRATION
-# ─────────────────────────────────────────────────────────────
+
 def _get_login_user(identifier):
     """Find a user by email, username, or unique display name for password login."""
     identifier = (identifier or '').strip()
