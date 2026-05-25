@@ -36,6 +36,11 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+img {
+  max-width: 100%;
+  height: auto;
+}
+
 /* Typography */
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-heading);
@@ -542,6 +547,24 @@ footer {
 }
 
 @media (max-width: 768px) {
+  .navbar {
+    padding: 12px 0;
+    background: rgba(11, 11, 11, 0.92);
+  }
+  .navbar-collapse {
+    margin-top: 14px;
+    padding: 12px 0 18px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .nav-link {
+    display: inline-flex;
+    margin: 8px 0;
+  }
+  .navbar .d-flex.align-items-center.gap-3 {
+    align-items: flex-start !important;
+    flex-direction: column;
+    gap: 8px !important;
+  }
   .navbar-brand {
     gap: 8px;
     font-size: 1.5rem;
@@ -558,6 +581,21 @@ footer {
   }
   .section-padding {
     padding: 60px 0;
+  }
+  .page-header {
+    padding: 120px 0 55px;
+  }
+  .watch-info {
+    padding: 18px;
+  }
+  .btn-gold,
+  .btn-outline-gold {
+    width: 100%;
+    padding: 11px 18px;
+  }
+  .hero .d-flex,
+  form.d-flex {
+    flex-direction: column;
   }
   .hero-overlay {
     background: linear-gradient(180deg, rgba(11,11,11,0.5) 0%, rgba(11,11,11,0.9) 100%);

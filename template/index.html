@@ -98,9 +98,7 @@
                     <a href="{% url 'product' watch.slug %}" class="text-decoration-none">
                         <div class="watch-card">
                             <div class="watch-img-wrap">
-                                {% with image=watch.display_images.0 %}
-                                <img src="{% if image %}{{ image.image.url }}{% else %}{% static 'images/black.png' %}{% endif %}" alt="{{ watch.name }}" width="320" height="320" loading="lazy" decoding="async">
-                                {% endwith %}
+                                <img src="{{ watch.display_image_src }}" alt="{{ watch.name }}" width="320" height="320" loading="lazy" decoding="async">
                             </div>
                             <div class="watch-info">
                                 <h3 class="watch-title text-white">{{ watch.name }}</h3>
@@ -134,9 +132,7 @@
                     <div class="swiper-slide">
                         <div class="watch-card text-center p-3">
                             <div class="watch-img-wrap">
-                                {% with image=watch.display_images.0 %}
-                                <img src="{% if image %}{{ image.image.url }}{% else %}{% static 'images/black.png' %}{% endif %}" alt="{{ watch.name }}" width="320" height="320" loading="lazy" decoding="async">
-                                {% endwith %}
+                                <img src="{{ watch.display_image_src }}" alt="{{ watch.name }}" width="320" height="320" loading="lazy" decoding="async">
                             </div>
                             <div class="watch-info">
                                 <h3 class="watch-title text-white">{{ watch.name }}</h3>

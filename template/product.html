@@ -72,7 +72,7 @@
                 
                 <div class="col-lg-6" data-aos="fade-right">
                     <div class="product-gallery-img">
-                        <img src="{% if watch.images.first %}{{ watch.images.first.image.url }}{% else %}{% static 'images/default_watch.png' %}{% endif %}" alt="{{ watch.name }}" class="img-fluid mouse-glow" style="cursor: zoom-in;" id="mainProductImage">
+                        <img src="{{ watch.display_image_src }}" alt="{{ watch.name }}" class="img-fluid mouse-glow" style="cursor: zoom-in;" id="mainProductImage">
                     </div>
                     <div class="row g-3 mt-1">
                         {% for img in watch.images.all %}

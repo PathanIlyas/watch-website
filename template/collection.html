@@ -71,7 +71,9 @@
             <!-- Filters -->
             <div class="row mb-5 align-items-center" data-aos="fade-up">
                 <div class="col-md-6">
-                    <p class="mb-0">Showing 1-6 of 24 results</p>
+                    <p class="mb-0">
+                        Showing {{ page_obj.start_index }}-{{ page_obj.end_index }} of {{ paginator.count }} result{{ paginator.count|pluralize }}
+                    </p>
                 </div>
                 <div class="col-md-6 text-md-end mt-3 mt-md-0">
                     <div class="d-inline-flex gap-3 align-items-center">
@@ -92,7 +94,7 @@
                 <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="100">
                     <div class="watch-card text-center p-3">
                         <div class="watch-img-wrap">
-                            <img src="{% if watch.images.first %}{{ watch.images.first.image.url }}{% else %}{% static 'images/default_watch.png' %}{% endif %}" alt="{{ watch.name }}">
+                            <img src="{{ watch.display_image_src }}" alt="{{ watch.name }}">
                         </div>
                         <div class="watch-info">
                             <h3 class="watch-title text-white">{{ watch.name }}</h3>
@@ -108,17 +110,36 @@
                 {% endfor %}
             </div>
 
-            <!-- Pagination -->
+            {% if page_obj.has_other_pages %}
             <div class="row mt-5">
                 <div class="col-12 text-center">
-                    <div class="d-inline-flex gap-2">
-                        <a href="#" class="btn btn-outline-gold bg-gold text-dark border-gold">1</a>
-                        <a href="#" class="btn btn-outline-gold">2</a>
-                        <a href="#" class="btn btn-outline-gold">3</a>
-                        <a href="#" class="btn btn-outline-gold"><i class="fas fa-chevron-right"></i></a>
-                    </div>
+                    <nav aria-label="Collection pagination">
+                        <div class="d-inline-flex flex-wrap justify-content-center gap-2">
+                            {% if page_obj.has_previous %}
+                                <a href="?page={{ page_obj.previous_page_number }}" class="btn btn-outline-gold" aria-label="Previous page">
+                                    <i class="fas fa-chevron-left"></i>
+                                </a>
+                            {% endif %}
+
+                            {% for page_number in paginator.page_range %}
+                                {% if page_number == page_obj.number %}
+                                    <span class="btn btn-outline-gold bg-gold text-dark border-gold" aria-current="page">{{ page_number }}</span>
+                                {% elif page_number >= page_obj.number|add:"-2" and page_number <= page_obj.number|add:"2" %}
+                                    <a href="?page={{ page_number }}" class="btn btn-outline-gold">{{ page_number }}</a>
+                                {% endif %}
+                            {% endfor %}
+
+                            {% if page_obj.has_next %}
+                                <a href="?page={{ page_obj.next_page_number }}" class="btn btn-outline-gold" aria-label="Next page">
+                                    <i class="fas fa-chevron-right"></i>
+                                </a>
+                            {% endif %}
+                        </div>
+                    </nav>
                 </div>
             </div>
+            {% endif %}
+
         </div>
     </section>
 
