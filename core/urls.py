@@ -18,11 +18,13 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from .views import health
 
 urlpatterns = [
     # Disable default admin UI for normal usage as requested
     # path('admin/', admin.site.urls),
-    
+
+    path('health/', health, name='health'),
     path('api/accounts/', include('accounts.urls')),
     path('accounts/', include('accounts.urls')),   # public auth pages
     path('api/store/', include('store.urls')),
