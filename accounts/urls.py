@@ -11,6 +11,7 @@ urlpatterns = [
     path('register/verify-otp/', views.register_verify_otp, name='register_verify_otp'),
 
     # Login 2FA OTP verify
+    path('login/send-otp/', views.login_send_otp,   name='login_send_otp'),
     path('login/verify-otp/', views.login_verify_otp, name='login_verify_otp'),
 
     # Password reset

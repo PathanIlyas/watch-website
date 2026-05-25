@@ -52,25 +52,25 @@ def send_otp_view(request):
                 'purpose': purpose, 'phone': phone_raw,
             })
 
-        # Get or create user for login/register
+        # Find the existing user for login. Login should not silently create
+        # a partial account because that can block the real registration flow.
         user = None
         if purpose == 'login':
             try:
                 user = User.objects.get(phone_number=phone)
             except User.DoesNotExist:
-                # Auto-register with phone as username
-                user = User.objects.create_user(
-                    username=phone,
-                    phone_number=phone,
-                    password=None,
-                )
+                return render(request, 'otp_auth/send_otp.html', {
+                    'error': 'No account exists with this mobile number. Please register first.',
+                    'purpose': purpose,
+                    'phone': phone_raw,
+                })
 
         # Create OTP record
         ip = get_client_ip(request)
         otp_plain, record = create_otp_record(phone, purpose, user=user, ip=ip)
 
         # Send SMS
-        result = send_otp_sms(phone, otp_plain)
+        result = send_otp_sms(phone, otp_plain, customer_email=getattr(user, 'email', ''))
 
         if not result.get('success'):
             logger.error("[OTP] SMS send failed for %s: %s", phone, result.get('error'))
@@ -83,6 +83,8 @@ def send_otp_view(request):
         request.session['otp_phone']   = phone
         request.session['otp_purpose'] = purpose
         request.session['otp_record_id'] = record.id
+        if purpose == 'login' and user:
+            request.session['pending_user_id'] = user.id
 
         # Console mode: show OTP on screen in DEBUG
         console_otp = otp_plain if (result.get('console') and settings.DEBUG) else None
@@ -204,12 +206,15 @@ def resend_otp_view(request):
         pass
 
     otp_plain, record = create_otp_record(phone, purpose, user=user, ip=ip)
-    result = send_otp_sms(phone, otp_plain, customer_email=getattr(user, 'email', ''))
+    customer_email = getattr(user, 'email', '') or request.session.get('reg_email', '')
+    result = send_otp_sms(phone, otp_plain, customer_email=customer_email)
 
     if not result.get('success'):
         return JsonResponse({'success': False, 'error': 'Failed to resend OTP. Try again.'})
 
     request.session['otp_record_id'] = record.id
+    if purpose == 'login' and user:
+        request.session['pending_user_id'] = user.id
     expiry = getattr(settings, 'OTP_EXPIRY_MINUTES', 5)
 
     response_data = {

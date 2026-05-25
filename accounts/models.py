@@ -26,3 +26,38 @@ class CustomUser(AbstractUser):
     @property
     def display_name(self):
         return self.full_name or self.get_full_name() or self.username
+
+
+class LoginActivity(models.Model):
+    METHOD_CHOICES = (
+        ('password', 'Password'),
+        ('otp', 'OTP'),
+    )
+
+    STATUS_CHOICES = (
+        ('success', 'Success'),
+        ('failed', 'Failed'),
+    )
+
+    user = models.ForeignKey(
+        CustomUser,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='login_activities',
+    )
+    identifier = models.CharField(max_length=255, blank=True)
+    method = models.CharField(max_length=20, choices=METHOD_CHOICES)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES)
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+    user_agent = models.CharField(max_length=255, blank=True)
+    message = models.CharField(max_length=255, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = 'Login Activity'
+        verbose_name_plural = 'Login Activities'
+
+    def __str__(self):
+        return f"{self.get_method_display()} {self.get_status_display()} - {self.identifier}"

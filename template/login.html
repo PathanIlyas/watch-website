@@ -4,233 +4,313 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sign In — CHRONOS Luxury Watches</title>
+  <title>Sign In - CHRONOS Luxury Watches</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    :root{--gold:#D4AF37;--bg:#0B0B0B;--card:#1A1A1A;}
-    *{box-sizing:border-box;margin:0;padding:0;}
-    body{
-      background:var(--bg);
-      font-family:'Poppins',sans-serif;
-      min-height:100vh;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      position:relative;
-      overflow:hidden;
-    }
-    /* Ambient glow */
-    body::before{
-      content:'';position:absolute;top:-200px;left:50%;transform:translateX(-50%);
-      width:600px;height:600px;border-radius:50%;
-      background:radial-gradient(circle,rgba(212,175,55,.08) 0%,transparent 70%);
-      pointer-events:none;
-    }
-
-    .login-wrapper{width:100%;max-width:440px;padding:20px;}
-
-    .brand{
-      text-align:center;margin-bottom:40px;
-    }
-    .brand-name{
-      font-family:'Playfair Display',serif;font-size:2.2rem;
-      font-weight:700;letter-spacing:8px;color:var(--gold);
-    }
-    .brand-tagline{
-      font-size:.7rem;letter-spacing:4px;text-transform:uppercase;
-      color:rgba(160,160,160,.6);margin-top:6px;
-    }
-    .brand-divider{
-      width:50px;height:1px;background:var(--gold);
-      margin:14px auto 0;opacity:.5;
-    }
-
-    .login-card{
-      background:rgba(26,26,26,.85);
-      backdrop-filter:blur(30px);
-      -webkit-backdrop-filter:blur(30px);
-      border:1px solid rgba(212,175,55,.18);
-      border-radius:20px;
-      padding:40px 40px 36px;
-      box-shadow:0 30px 80px rgba(0,0,0,.7);
-    }
-
-    .login-card h4{
-      font-family:'Playfair Display',serif;
-      color:#F5F5F5;font-size:1.3rem;
-      margin-bottom:6px;
-    }
-    .login-card p{color:rgba(160,160,160,.7);font-size:.85rem;margin-bottom:28px;}
-
-    .form-label{
-      color:rgba(245,245,245,.55);font-size:.75rem;
-      letter-spacing:.5px;text-transform:uppercase;margin-bottom:7px;
-    }
-    .form-control{
-      background:rgba(255,255,255,.04);
-      border:1px solid rgba(255,255,255,.1);
-      color:#F5F5F5;border-radius:10px;
-      padding:13px 16px;font-size:.9rem;
-      transition:all .3s;
-    }
-    .form-control:focus{
-      background:rgba(212,175,55,.05);
-      border-color:var(--gold);color:#F5F5F5;
-      box-shadow:0 0 0 3px rgba(212,175,55,.1);outline:none;
-    }
-    .form-control::placeholder{color:rgba(245,245,245,.25);}
-
-    /* Password toggle */
-    .input-group .form-control{border-right:none;border-radius:10px 0 0 10px;}
-    .input-group .btn-toggle{
-      background:rgba(255,255,255,.04);
-      border:1px solid rgba(255,255,255,.1);border-left:none;
-      color:rgba(160,160,160,.6);border-radius:0 10px 10px 0;
-      padding:0 14px;transition:all .3s;
-    }
-    .input-group .btn-toggle:hover{color:var(--gold);}
-    .input-group:focus-within .form-control,
-    .input-group:focus-within .btn-toggle{border-color:var(--gold);}
-
-    .btn-signin{
-      background:linear-gradient(135deg,#D4AF37,#B8960C);
-      color:#000;font-weight:700;border:none;
-      border-radius:10px;padding:14px;
-      font-size:.95rem;letter-spacing:1px;text-transform:uppercase;
-      width:100%;transition:all .3s;margin-top:8px;
-    }
-    .btn-signin:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(212,175,55,.4);color:#000;}
-    .btn-signin:disabled{opacity:.6;transform:none;}
-
-    .alert-error{
-      background:rgba(220,53,69,.1);border:1px solid rgba(220,53,69,.3);
-      color:#f8d7da;border-radius:10px;padding:12px 16px;
-      font-size:.85rem;margin-bottom:20px;
-    }
-
-    .back-link{
-      display:block;text-align:center;margin-top:24px;
-      color:rgba(160,160,160,.5);font-size:.82rem;text-decoration:none;
-      transition:color .3s;
-    }
+    :root{--gold:#D4AF37;--gold-dark:#B8960C;--bg:#0B0B0B;--panel:#171717;--muted:#A0A0A0;}
+    *{box-sizing:border-box;}
+    body{min-height:100vh;margin:0;background:var(--bg);color:#F5F5F5;font-family:'Poppins',sans-serif;display:flex;align-items:center;justify-content:center;padding:28px 16px;position:relative;overflow-x:hidden;}
+    body::before{content:'';position:fixed;inset:-25% auto auto 50%;width:560px;height:560px;transform:translateX(-50%);border-radius:50%;background:radial-gradient(circle,rgba(212,175,55,.08),transparent 70%);pointer-events:none;}
+    .auth-shell{width:100%;max-width:470px;position:relative;z-index:1;}
+    .brand{text-align:center;margin-bottom:28px;}
+    .brand-name{font-family:'Playfair Display',serif;font-size:2.15rem;font-weight:700;letter-spacing:8px;color:var(--gold);display:inline-flex;align-items:center;justify-content:center;gap:12px;line-height:1;}
+    .brand-logo-img{width:64px;height:64px;object-fit:contain;filter:drop-shadow(0 4px 10px rgba(212,175,55,.22));}
+    .brand-tag{font-size:.68rem;letter-spacing:4px;text-transform:uppercase;color:rgba(160,160,160,.58);margin-top:8px;}
+    .brand-line{width:54px;height:1px;background:var(--gold);opacity:.55;margin:14px auto 0;}
+    .auth-card{background:rgba(23,23,23,.9);border:1px solid rgba(212,175,55,.18);border-radius:20px;padding:30px;box-shadow:0 30px 80px rgba(0,0,0,.65);backdrop-filter:blur(24px);}
+    .auth-title{font-family:'Playfair Display',serif;font-size:1.35rem;margin-bottom:4px;}
+    .auth-subtitle{color:rgba(160,160,160,.72);font-size:.86rem;margin-bottom:20px;}
+    .nav-pills{background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:4px;margin-bottom:24px;}
+    .nav-pills .nav-link{border-radius:9px;color:rgba(245,245,245,.62);font-size:.86rem;font-weight:600;padding:10px 12px;}
+    .nav-pills .nav-link.active{background:linear-gradient(135deg,var(--gold),var(--gold-dark));color:#070707;}
+    .form-label{font-size:.73rem;text-transform:uppercase;letter-spacing:.6px;color:rgba(245,245,245,.58);margin-bottom:7px;}
+    .form-control{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:#F5F5F5;padding:13px 15px;font-size:.92rem;}
+    .form-control:focus{background:rgba(212,175,55,.055);border-color:var(--gold);color:#F5F5F5;box-shadow:0 0 0 3px rgba(212,175,55,.1);}
+    .form-control::placeholder{color:rgba(245,245,245,.28);}
+    .input-group .form-control{border-right:0;border-radius:10px 0 0 10px;}
+    .btn-eye{border:1px solid rgba(255,255,255,.1);border-left:0;background:rgba(255,255,255,.04);color:rgba(245,245,245,.6);border-radius:0 10px 10px 0;padding:0 14px;}
+    .btn-gold{width:100%;border:0;border-radius:10px;background:linear-gradient(135deg,var(--gold),var(--gold-dark));color:#050505;font-weight:700;text-transform:uppercase;letter-spacing:.8px;padding:13px 15px;}
+    .btn-gold:hover{color:#050505;box-shadow:0 12px 28px rgba(212,175,55,.34);transform:translateY(-1px);}
+    .btn-gold:disabled{opacity:.65;box-shadow:none;transform:none;}
+    .btn-outline-gold{width:100%;border:1px solid rgba(212,175,55,.34);border-radius:10px;color:var(--gold);background:rgba(212,175,55,.05);font-weight:600;padding:12px 15px;}
+    .btn-outline-gold:hover{border-color:var(--gold);background:rgba(212,175,55,.1);color:var(--gold);}
+    .alert{border-radius:10px;font-size:.84rem;padding:12px 14px;}
+    .alert-danger{background:rgba(220,53,69,.1);border-color:rgba(220,53,69,.3);color:#f8d7da;}
+    .alert-success{background:rgba(25,135,84,.1);border-color:rgba(25,135,84,.3);color:#d1e7dd;}
+    .helper-link{color:rgba(212,175,55,.75);font-size:.78rem;text-decoration:none;}
+    .helper-link:hover{color:var(--gold);}
+    .divider{display:flex;align-items:center;gap:12px;margin:22px 0;}
+    .divider::before,.divider::after{content:'';height:1px;background:rgba(255,255,255,.08);flex:1;}
+    .divider span{font-size:.75rem;color:rgba(160,160,160,.42);text-transform:uppercase;letter-spacing:.5px;}
+    .muted-action{text-align:center;color:rgba(160,160,160,.6);font-size:.84rem;}
+    .muted-action a{color:var(--gold);text-decoration:none;font-weight:600;}
+    .otp-panel{display:none;}
+    .otp-code{letter-spacing:7px;text-align:center;font-size:1.35rem;font-weight:700;}
+    .timer-pill{display:inline-flex;align-items:center;gap:8px;border:1px solid rgba(212,175,55,.22);background:rgba(212,175,55,.07);border-radius:999px;color:rgba(245,245,245,.78);font-size:.82rem;padding:7px 12px;}
+    .dev-box{display:none;border:1px dashed rgba(212,175,55,.45);border-radius:10px;background:rgba(212,175,55,.08);padding:12px;text-align:center;color:var(--gold);font-weight:700;letter-spacing:6px;margin-bottom:16px;}
+    .security-note{color:rgba(160,160,160,.42);font-size:.72rem;text-align:center;margin-top:18px;}
+    .back-link{display:block;text-align:center;margin-top:22px;color:rgba(160,160,160,.48);font-size:.82rem;text-decoration:none;}
     .back-link:hover{color:var(--gold);}
-    .back-link i{margin-right:6px;}
-    .divider{display:flex;align-items:center;gap:12px;margin:20px 0 0;}
-    .divider span{color:rgba(160,160,160,.3);font-size:.78rem;white-space:nowrap;}
-    .divider::before,.divider::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.07);}
-    .alt-link{display:block;text-align:center;color:rgba(160,160,160,.5);font-size:.82rem;text-decoration:none;transition:color .3s;margin-top:14px;}
-    .alt-link:hover{color:var(--gold);}
-    .alt-link span{color:var(--gold);}
-
-    .security-note{
-      display:flex;align-items:center;gap:8px;
-      color:rgba(160,160,160,.35);font-size:.72rem;
-      margin-top:20px;justify-content:center;
+    @media (max-width:480px){
+      .auth-card{padding:24px 20px;}
+      .brand-name{font-size:1.8rem;letter-spacing:5px;}
+      .brand-logo-img{width:56px;height:56px;}
     }
-    .security-note i{color:rgba(212,175,55,.5);}
   </style>
 </head>
 <body>
-
-<div class="login-wrapper">
-
-  <!-- Brand -->
+<main class="auth-shell">
   <div class="brand">
-    <div class="brand-name">CHRONOS</div>
-    <div class="brand-tagline">Precision · Elegance · Legacy</div>
-    <div class="brand-divider"></div>
+    <div class="brand-name">
+      <img src="{% static 'images/watch_logo_mark.png' %}" alt="" class="brand-logo-img" width="64" height="64">
+      <span>CHRONOS</span>
+    </div>
+    <div class="brand-tag">Precision · Elegance · Legacy</div>
+    <div class="brand-line"></div>
   </div>
 
-  <!-- Card -->
-  <div class="login-card">
-    <h4>Welcome Back</h4>
-    <p>Sign in to access your account or dashboard</p>
+  <section class="auth-card">
+    <h1 class="auth-title">Welcome Back</h1>
+    <p class="auth-subtitle">Choose one secure way to access your account.</p>
 
+    {% if error %}
+      <div class="alert alert-danger">{{ error }}</div>
+    {% endif %}
     {% if messages %}
       {% for message in messages %}
-      <div class="alert-error">
-        <i class="fas fa-exclamation-circle me-2"></i>{{ message }}
-      </div>
+        <div class="alert alert-success">{{ message }}</div>
       {% endfor %}
     {% endif %}
+    <div id="otpAlert" class="alert d-none"></div>
 
-    <form method="post" id="loginForm">
-      {% csrf_token %}
+    <ul class="nav nav-pills nav-fill" id="loginTabs" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="password-tab" data-bs-toggle="pill" data-bs-target="#passwordPane" type="button" role="tab">Password Login</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="otp-tab" data-bs-toggle="pill" data-bs-target="#otpPane" type="button" role="tab">OTP Login</button>
+      </li>
+    </ul>
 
-      <div class="mb-3">
-        <label class="form-label">Username</label>
-        <input type="text" name="username" class="form-control"
-               placeholder="Enter your username" required autofocus
-               value="{{ form.username.value|default:'' }}">
-      </div>
-
-      <div class="mb-4">
-        <div class="d-flex justify-content-between align-items-center mb-2">
-          <label class="form-label mb-0">Password</label>
-          <a href="{% url 'forgot_password' %}" style="color:rgba(212,175,55,.6);font-size:.75rem;text-decoration:none;transition:color .3s;" onmouseover="this.style.color='#D4AF37'" onmouseout="this.style.color='rgba(212,175,55,.6)'">Forgot password?</a>
-        </div>
-        <div class="input-group">
-          <input type="password" name="password" id="passwordField"
-                 class="form-control" placeholder="Enter your password" required>
-          <button type="button" class="btn-toggle" id="togglePwd" tabindex="-1">
-            <i class="fas fa-eye" id="eyeIcon"></i>
+    <div class="tab-content">
+      <div class="tab-pane fade show active" id="passwordPane" role="tabpanel" aria-labelledby="password-tab">
+        <form method="post" id="passwordLoginForm">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label class="form-label" for="usernameInput">Username / Email / Name</label>
+            <input type="text" id="usernameInput" name="username" class="form-control" placeholder="username, name, or email@example.com" value="{{ username|default:'' }}" required autofocus>
+          </div>
+          <div class="mb-3">
+            <div class="d-flex justify-content-between align-items-center">
+              <label class="form-label" for="passwordField">Password</label>
+              <a class="helper-link" href="{% url 'forgot_password' %}">Forgot Password?</a>
+            </div>
+            <div class="input-group">
+              <input type="password" id="passwordField" name="password" class="form-control" placeholder="Enter your password" required>
+              <button class="btn btn-eye" type="button" id="togglePwd">Show</button>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-gold" id="passwordBtn">
+            <span class="btn-text">Login</span>
+            <span class="btn-loading d-none"><span class="spinner-border spinner-border-sm me-2"></span>Signing in...</span>
           </button>
-        </div>
+        </form>
       </div>
 
-      <button type="submit" class="btn-signin" id="signinBtn">
-        <span id="btnText"><i class="fas fa-sign-in-alt me-2"></i>Sign In</span>
-        <span id="btnSpinner" class="d-none">
-          <span class="spinner-border spinner-border-sm me-2" role="status"></span>Signing in...
-        </span>
-      </button>
-    </form>
+      <div class="tab-pane fade" id="otpPane" role="tabpanel" aria-labelledby="otp-tab">
+        <form id="otpSendForm">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label class="form-label" for="otpPhone">Registered Phone Number</label>
+            <input type="tel" id="otpPhone" class="form-control" placeholder="98765 43210" maxlength="10" inputmode="numeric" autocomplete="tel">
+          </div>
+          <button type="submit" class="btn btn-gold" id="sendOtpBtn">
+            <span class="btn-text">Send OTP</span>
+            <span class="btn-loading d-none"><span class="spinner-border spinner-border-sm me-2"></span>Sending...</span>
+          </button>
+        </form>
 
-    <div class="divider"><span>or</span></div>
-    <a href="{% url 'otp_send' %}?purpose=login" class="alt-link">
-      Login with <span>OTP (Mobile Number)</span>
-    </a>
+        <div class="otp-panel mt-4" id="otpPanel">
+          <div id="devOtpBox" class="dev-box"></div>
+          <div class="mb-3">
+            <label class="form-label" for="otpCode">OTP Code</label>
+            <input type="text" id="otpCode" class="form-control otp-code" placeholder="000000" maxlength="6" inputmode="numeric" autocomplete="one-time-code">
+          </div>
+          <div class="d-flex justify-content-center mb-3">
+            <span class="timer-pill">OTP expires in <strong id="otpTimer">5:00</strong></span>
+          </div>
+          <button type="button" class="btn btn-gold mb-2" id="verifyOtpBtn" disabled>
+            <span class="btn-text">Verify OTP</span>
+            <span class="btn-loading d-none"><span class="spinner-border spinner-border-sm me-2"></span>Verifying...</span>
+          </button>
+          <button type="button" class="btn btn-outline-gold" id="resendOtpBtn" disabled>Resend OTP</button>
+        </div>
+      </div>
+    </div>
 
     <div class="divider"><span>new to chronos?</span></div>
-    <a href="{% url 'register' %}" class="alt-link">
-      Create your <span>CHRONOS Account</span>
-    </a>
+    <p class="muted-action mb-0">Create your <a href="{% url 'register' %}">CHRONOS account</a></p>
+    <div class="security-note">Secure checkout-ready authentication for luxury purchases.</div>
+  </section>
 
-    <div class="security-note">
-      <i class="fas fa-lock"></i>
-      Secured with 256-bit SSL encryption
-    </div>
-  </div>
-
-  <a href="{% url 'home' %}" class="back-link">
-    <i class="fas fa-arrow-left"></i>Return to CHRONOS
-  </a>
-
-</div>
+  <a href="{% url 'home' %}" class="back-link">Return to CHRONOS</a>
+</main>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-  // Password visibility toggle
-  document.getElementById('togglePwd').addEventListener('click', function() {
-    const field = document.getElementById('passwordField');
-    const icon  = document.getElementById('eyeIcon');
-    if (field.type === 'password') {
-      field.type = 'text';
-      icon.classList.replace('fa-eye', 'fa-eye-slash');
-    } else {
-      field.type = 'password';
-      icon.classList.replace('fa-eye-slash', 'fa-eye');
-    }
-  });
+const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+const otpAlert = document.getElementById('otpAlert');
+const otpPhone = document.getElementById('otpPhone');
+const otpCode = document.getElementById('otpCode');
+const otpPanel = document.getElementById('otpPanel');
+const otpTimer = document.getElementById('otpTimer');
+const sendOtpBtn = document.getElementById('sendOtpBtn');
+const verifyOtpBtn = document.getElementById('verifyOtpBtn');
+const resendOtpBtn = document.getElementById('resendOtpBtn');
+const devOtpBox = document.getElementById('devOtpBox');
+let otpSeconds = 300;
+let timerHandle = null;
+let verifiedPhone = '';
 
-  // Loading state
-  document.getElementById('loginForm').addEventListener('submit', function() {
-    document.getElementById('btnText').classList.add('d-none');
-    document.getElementById('btnSpinner').classList.remove('d-none');
-    document.getElementById('signinBtn').disabled = true;
-  });
+function setLoading(button, loading) {
+  button.disabled = loading;
+  button.querySelector('.btn-text').classList.toggle('d-none', loading);
+  button.querySelector('.btn-loading').classList.toggle('d-none', !loading);
+}
+
+function showOtpAlert(message, type) {
+  otpAlert.className = 'alert alert-' + type;
+  otpAlert.textContent = message;
+}
+
+function clearOtpAlert() {
+  otpAlert.className = 'alert d-none';
+  otpAlert.textContent = '';
+}
+
+function cleanDigits(value) {
+  return value.replace(/\D/g, '').slice(0, 10);
+}
+
+function formatTimer(seconds) {
+  const mins = Math.floor(seconds / 60);
+  const secs = seconds % 60;
+  return mins + ':' + String(secs).padStart(2, '0');
+}
+
+function startTimer(seconds) {
+  clearInterval(timerHandle);
+  otpSeconds = seconds || 300;
+  otpTimer.textContent = formatTimer(otpSeconds);
+  resendOtpBtn.disabled = true;
+  timerHandle = setInterval(() => {
+    otpSeconds -= 1;
+    otpTimer.textContent = otpSeconds > 0 ? formatTimer(otpSeconds) : 'Expired';
+    if (otpSeconds <= 0) {
+      clearInterval(timerHandle);
+      verifyOtpBtn.disabled = true;
+      resendOtpBtn.disabled = false;
+      showOtpAlert('OTP expired. Please request a new one.', 'danger');
+    }
+  }, 1000);
+  setTimeout(() => { resendOtpBtn.disabled = false; }, 60000);
+}
+
+function applyOtpResponse(data) {
+  verifiedPhone = data.phone || verifiedPhone;
+  otpPanel.style.display = 'block';
+  otpCode.value = '';
+  verifyOtpBtn.disabled = true;
+  startTimer(data.expiry_seconds || 300);
+  if (data.console_otp) {
+    devOtpBox.style.display = 'block';
+    devOtpBox.textContent = data.console_otp;
+    otpCode.value = data.console_otp;
+    verifyOtpBtn.disabled = false;
+  } else {
+    devOtpBox.style.display = 'none';
+    devOtpBox.textContent = '';
+  }
+  showOtpAlert(data.message || 'OTP sent successfully.', 'success');
+  otpCode.focus();
+}
+
+async function sendOtp() {
+  clearOtpAlert();
+  const phone = cleanDigits(otpPhone.value);
+  if (phone.length !== 10) {
+    showOtpAlert('Enter a valid 10-digit registered phone number.', 'danger');
+    return;
+  }
+  setLoading(sendOtpBtn, true);
+  try {
+    const response = await fetch("{% url 'login_send_otp' %}", {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json', 'X-CSRFToken': csrfToken},
+      body: JSON.stringify({phone})
+    });
+    const data = await response.json();
+    if (!data.success) throw new Error(data.error || 'Unable to send OTP.');
+    applyOtpResponse(data);
+  } catch (error) {
+    showOtpAlert(error.message || 'Unable to send OTP. Please try again.', 'danger');
+  } finally {
+    setLoading(sendOtpBtn, false);
+  }
+}
+
+document.getElementById('togglePwd').addEventListener('click', function() {
+  const field = document.getElementById('passwordField');
+  field.type = field.type === 'password' ? 'text' : 'password';
+  this.textContent = field.type === 'password' ? 'Show' : 'Hide';
+});
+
+document.getElementById('passwordLoginForm').addEventListener('submit', function() {
+  setLoading(document.getElementById('passwordBtn'), true);
+});
+
+otpPhone.addEventListener('input', function() { this.value = cleanDigits(this.value); });
+otpCode.addEventListener('input', function() {
+  this.value = this.value.replace(/\D/g, '').slice(0, 6);
+  verifyOtpBtn.disabled = this.value.length !== 6 || otpSeconds <= 0;
+});
+
+document.getElementById('otpSendForm').addEventListener('submit', function(event) {
+  event.preventDefault();
+  sendOtp();
+});
+
+verifyOtpBtn.addEventListener('click', async function() {
+  clearOtpAlert();
+  const otp = otpCode.value.replace(/\D/g, '');
+  if (otp.length !== 6) {
+    showOtpAlert('Enter the 6-digit OTP.', 'danger');
+    return;
+  }
+  setLoading(verifyOtpBtn, true);
+  try {
+    const response = await fetch("{% url 'login_verify_otp' %}", {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json', 'X-CSRFToken': csrfToken},
+      body: JSON.stringify({phone: verifiedPhone, otp, purpose: 'login'})
+    });
+    const data = await response.json();
+    if (!data.success) throw new Error(data.error || 'Invalid OTP.');
+    showOtpAlert('OTP verified. Redirecting...', 'success');
+    clearInterval(timerHandle);
+    window.location.href = data.redirect || '/';
+  } catch (error) {
+    showOtpAlert(error.message || 'Verification failed. Please try again.', 'danger');
+    setLoading(verifyOtpBtn, false);
+    verifyOtpBtn.disabled = otpCode.value.length !== 6;
+  }
+});
+
+resendOtpBtn.addEventListener('click', async function() {
+  resendOtpBtn.disabled = true;
+  await sendOtp();
+});
 </script>
 </body>
 </html>

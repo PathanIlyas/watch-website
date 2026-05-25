@@ -1,12 +1,18 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
-from .models import Watch, Category, HomepageBanner, ContactMessage
+from django.db.models import Prefetch
+from .models import Watch, WatchImage, Category, HomepageBanner, ContactMessage
 from orders.emails import send_contact_confirmation, send_contact_admin_notification
 
 
 def home(request):
-    featured_watches = Watch.objects.filter(is_featured=True)[:4]
-    trending_watches = Watch.objects.filter(is_trending=True)[:4]
+    display_image_prefetch = Prefetch(
+        'images',
+        queryset=WatchImage.objects.order_by('-is_primary', 'id'),
+        to_attr='display_images',
+    )
+    featured_watches = Watch.objects.filter(is_featured=True).prefetch_related(display_image_prefetch)[:4]
+    trending_watches = Watch.objects.filter(is_trending=True).prefetch_related(display_image_prefetch)[:4]
     banners = HomepageBanner.objects.filter(is_active=True)
     return render(request, 'index.html', {
         'featured_watches': featured_watches,

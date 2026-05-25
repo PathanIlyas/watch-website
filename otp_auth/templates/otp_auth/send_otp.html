@@ -24,7 +24,8 @@
     }
     .wrapper { width:100%; max-width:440px; padding:20px; }
     .brand { text-align:center; margin-bottom:36px; }
-    .brand-name { font-family:'Playfair Display',serif; font-size:2rem; font-weight:700; letter-spacing:8px; color:var(--gold); }
+    .brand-name { font-family:'Playfair Display',serif; font-size:2rem; font-weight:700; letter-spacing:8px; color:var(--gold); display:inline-flex; align-items:center; justify-content:center; gap:12px; line-height:1; }
+    .brand-logo-img { width:54px; height:54px; object-fit:contain; filter:drop-shadow(0 4px 10px rgba(212,175,55,.22)); }
     .brand-tag  { font-size:.68rem; letter-spacing:4px; text-transform:uppercase; color:rgba(160,160,160,.55); margin-top:5px; }
     .brand-line { width:48px; height:1px; background:var(--gold); margin:12px auto 0; opacity:.5; }
     .card {
@@ -78,7 +79,10 @@
 <body>
 <div class="wrapper">
   <div class="brand">
-    <div class="brand-name">CHRONOS</div>
+    <div class="brand-name">
+      <img src="{% static 'images/watch_logo_mark.png' %}" alt="" class="brand-logo-img" width="54" height="54">
+      <span>CHRONOS</span>
+    </div>
     <div class="brand-tag">Precision · Elegance · Legacy</div>
     <div class="brand-line"></div>
   </div>
@@ -129,7 +133,7 @@
 
     <div class="divider"><span>or</span></div>
     <a href="{% url 'login' %}" class="alt-link">
-      Sign in with <span>Username & Password</span>
+      Sign in with <span>Email / Mobile & Password</span>
     </a>
   </div>
 

@@ -5,6 +5,7 @@ All flows use OTP SMS verification.
 """
 import json
 import logging
+from datetime import timedelta
 
 from django.conf import settings
 from django.contrib import messages
@@ -24,6 +25,7 @@ from otp_auth.utils import (
     create_otp_record, verify_otp_code,
     is_rate_limited, get_client_ip,
 )
+from .models import LoginActivity
 
 logger = logging.getLogger(__name__)
 User = get_user_model()
@@ -50,9 +52,50 @@ def _otp_context(phone, purpose, expiry, console_otp=None):
     }
 
 
+def _record_login_activity(request, method, status, identifier='', user=None, message=''):
+    LoginActivity.objects.create(
+        user=user,
+        identifier=(identifier or '')[:255],
+        method=method,
+        status=status,
+        ip_address=get_client_ip(request),
+        user_agent=request.META.get('HTTP_USER_AGENT', '')[:255],
+        message=(message or '')[:255],
+    )
+
+
+def _is_password_locked(user):
+    lock_minutes = getattr(settings, 'PASSWORD_LOGIN_LOCK_MINUTES', 15)
+    max_attempts = getattr(settings, 'PASSWORD_LOGIN_MAX_ATTEMPTS', 5)
+    if not user or user.failed_login_attempts < max_attempts or not user.last_login_attempt:
+        return False
+    return user.last_login_attempt >= timezone.now() - timedelta(minutes=lock_minutes)
+
+
 # ─────────────────────────────────────────────────────────────
 # 1. REGISTRATION
 # ─────────────────────────────────────────────────────────────
+def _get_login_user(identifier):
+    """Find a user by email, username, or unique display name for password login."""
+    identifier = (identifier or '').strip()
+    if not identifier:
+        return None
+
+    user = User.objects.filter(email__iexact=identifier).first()
+    if user:
+        return user
+
+    user = User.objects.filter(username__iexact=identifier).first()
+    if user:
+        return user
+
+    full_name_matches = list(User.objects.filter(full_name__iexact=identifier)[:2])
+    if len(full_name_matches) == 1:
+        return full_name_matches[0]
+
+    return None
+
+
 def register_view(request):
     """Step 1: Collect user details → send OTP."""
     if request.user.is_authenticated:
@@ -60,6 +103,7 @@ def register_view(request):
 
     if request.method == 'POST':
         full_name = request.POST.get('full_name', '').strip()
+        username  = request.POST.get('username', '').strip()
         email     = request.POST.get('email', '').strip().lower()
         phone_raw = request.POST.get('phone', '').strip()
         password  = request.POST.get('password', '')
@@ -70,6 +114,8 @@ def register_view(request):
         # Validate fields
         if not full_name:
             errors['full_name'] = 'Full name is required.'
+        if not username:
+            errors['username'] = 'Username is required.'
         if not email:
             errors['email'] = 'Email is required.'
         if not phone_raw:
@@ -86,6 +132,8 @@ def register_view(request):
                 errors['phone'] = err
 
         # Duplicate checks
+        if username and User.objects.filter(username__iexact=username).exists():
+            errors['username'] = 'This username is already taken.'
         if email and User.objects.filter(email=email).exists():
             errors['email'] = 'An account with this email already exists.'
 
@@ -103,18 +151,21 @@ def register_view(request):
         if errors:
             return render(request, 'accounts/register.html', {
                 'errors': errors,
-                'full_name': full_name, 'email': email, 'phone': phone_raw,
+                'full_name': full_name, 'username': username,
+                'email': email, 'phone': phone_raw,
             })
 
         # Rate limit
         if is_rate_limited(phone, 'register'):
             return render(request, 'accounts/register.html', {
                 'errors': {'phone': 'Please wait 1 minute before requesting another OTP.'},
-                'full_name': full_name, 'email': email, 'phone': phone_raw,
+                'full_name': full_name, 'username': username,
+                'email': email, 'phone': phone_raw,
             })
 
         # Store registration data in session (not DB yet — wait for OTP)
         request.session['reg_full_name'] = full_name
+        request.session['reg_username']  = username
         request.session['reg_email']     = email
         request.session['reg_phone']     = phone
         request.session['reg_password']  = make_password(password)
@@ -126,7 +177,8 @@ def register_view(request):
         if not result.get('success'):
             return render(request, 'accounts/register.html', {
                 'errors': {'phone': 'Failed to send OTP. Please try again.'},
-                'full_name': full_name, 'email': email, 'phone': phone_raw,
+                'full_name': full_name, 'username': username,
+                'email': email, 'phone': phone_raw,
             })
 
         request.session['otp_phone']    = phone
@@ -163,6 +215,7 @@ def register_verify_otp(request):
 
     # Retrieve registration data from session
     full_name = request.session.get('reg_full_name', '')
+    username  = request.session.get('reg_username', '')
     email     = request.session.get('reg_email', '')
     reg_phone = request.session.get('reg_phone', phone)
     hashed_pw = request.session.get('reg_password', '')
@@ -173,7 +226,7 @@ def register_verify_otp(request):
     # Create user
     try:
         user = User.objects.create(
-            username=email,
+            username=username or email,
             email=email,
             full_name=full_name,
             phone_number=reg_phone,
@@ -191,8 +244,8 @@ def register_verify_otp(request):
         return JsonResponse({'success': False, 'error': 'Account creation failed. Please try again.'})
 
     # Clear session registration data
-    for key in ('reg_full_name', 'reg_email', 'reg_phone', 'reg_password',
-                'otp_phone', 'otp_purpose', 'otp_record_id'):
+    for key in ('reg_full_name', 'reg_username', 'reg_email', 'reg_phone',
+                'reg_password', 'otp_phone', 'otp_purpose', 'otp_record_id'):
         request.session.pop(key, None)
 
     # Auto-login
@@ -217,44 +270,50 @@ def login_view(request):
         return redirect('dashboard_home' if request.user.is_staff else 'home')
 
     if request.method == 'POST':
-        identifier = request.POST.get('username', '').strip()  # email or username
-        password   = request.POST.get('password', '').strip()
-        use_otp    = request.POST.get('use_otp') == '1'
-
-        # OTP-only login (no password)
-        if use_otp:
-            return redirect(f'/otp/send/?purpose=login')
-
+        identifier = request.POST.get('username', '').strip()  # email, username, or phone
+        password   = request.POST.get('password', '')
         if not identifier or not password:
             return render(request, 'login.html', {'error': 'Please enter your credentials.'})
 
-        # Try email login
-        user = None
-        if '@' in identifier:
-            try:
-                u = User.objects.get(email=identifier)
-                user = authenticate(request, username=u.username, password=password)
-            except User.DoesNotExist:
-                pass
-        if not user:
-            user = authenticate(request, username=identifier, password=password)
+        login_user = _get_login_user(identifier)
+        if login_user and _is_password_locked(login_user):
+            _record_login_activity(request, 'password', 'failed', identifier, login_user, 'Locked')
+            return render(request, 'login.html', {
+                'error': 'Too many failed attempts. Please wait 15 minutes or use OTP login.',
+                'username': identifier,
+            })
+
+        user = authenticate(
+            request,
+            username=login_user.username if login_user else identifier,
+            password=password,
+        )
 
         if user is None:
+            if login_user:
+                login_user.failed_login_attempts += 1
+                login_user.last_login_attempt = timezone.now()
+                login_user.save(update_fields=['failed_login_attempts', 'last_login_attempt'])
+            _record_login_activity(request, 'password', 'failed', identifier, login_user, 'Invalid credentials')
             return render(request, 'login.html', {
                 'error': 'Invalid credentials. Please try again.',
                 'username': identifier,
             })
 
         if not user.is_active:
+            _record_login_activity(request, 'password', 'failed', identifier, user, 'Inactive account')
             return render(request, 'login.html', {'error': 'Your account has been disabled.'})
 
-        # Admin users skip 2FA
-        if user.is_staff or user.is_superuser:
-            login(request, user)
-            return redirect('dashboard_home')
+        # Password login completes immediately; OTP is a separate login method.
+        login(request, user)
+        user.failed_login_attempts = 0
+        user.last_login_attempt = timezone.now()
+        user.save(update_fields=['failed_login_attempts', 'last_login_attempt'])
+        _record_login_activity(request, 'password', 'success', identifier, user)
+        return redirect('dashboard_home' if (user.is_staff or user.is_superuser) else 'home')
 
         # Check if user has a phone number for 2FA
-        if not user.phone_number:
+        if False and not user.phone_number:
             # No phone — login directly
             login(request, user)
             return redirect('home')
@@ -293,6 +352,59 @@ def login_view(request):
 
 
 @require_POST
+def login_send_otp(request):
+    """Send an OTP for phone-only login. This path never checks a password."""
+    try:
+        data = json.loads(request.body)
+    except json.JSONDecodeError:
+        data = request.POST
+
+    phone_raw = data.get('phone', '').strip()
+    valid, err = validate_phone(phone_raw)
+    if not valid:
+        return JsonResponse({'success': False, 'error': err}, status=400)
+
+    phone = normalize_phone(phone_raw)
+    user = User.objects.filter(phone_number=phone, is_active=True).first()
+    if not user:
+        _record_login_activity(request, 'otp', 'failed', phone, None, 'Unregistered phone number')
+        return JsonResponse({
+            'success': False,
+            'error': 'No account exists with this mobile number. Please register first.',
+        }, status=404)
+
+    if is_rate_limited(phone, 'login'):
+        _record_login_activity(request, 'otp', 'failed', phone, user, 'Rate limited')
+        return JsonResponse({
+            'success': False,
+            'error': 'Please wait before requesting another OTP.',
+        }, status=429)
+
+    ip = get_client_ip(request)
+    otp_plain, record, result = _send_otp(phone, 'login', user=user, ip=ip, email=user.email)
+
+    if not result.get('success'):
+        _record_login_activity(request, 'otp', 'failed', phone, user, 'OTP delivery failed')
+        return JsonResponse({'success': False, 'error': 'Failed to send OTP. Please try again.'}, status=502)
+
+    request.session['otp_phone'] = phone
+    request.session['otp_purpose'] = 'login'
+    request.session['otp_record_id'] = record.id
+    request.session['pending_user_id'] = user.id
+
+    response = {
+        'success': True,
+        'message': 'OTP sent successfully.',
+        'phone': phone,
+        'masked_phone': f"{'*' * (len(phone) - 4)}{phone[-4:]}",
+        'expiry_seconds': getattr(settings, 'OTP_EXPIRY_MINUTES', 5) * 60,
+    }
+    if result.get('console') and settings.DEBUG:
+        response['console_otp'] = otp_plain
+    return JsonResponse(response)
+
+
+@require_POST
 def login_verify_otp(request):
     """Step 2: Verify 2FA OTP → complete login."""
     try:
@@ -308,6 +420,9 @@ def login_verify_otp(request):
 
     success, message = verify_otp_code(phone, otp_input, 'login')
     if not success:
+        user_id = request.session.get('pending_user_id')
+        failed_user = User.objects.filter(id=user_id).first() if user_id else None
+        _record_login_activity(request, 'otp', 'failed', phone, failed_user, message)
         return JsonResponse({'success': False, 'error': message})
 
     user_id = request.session.get('pending_user_id')
@@ -320,6 +435,11 @@ def login_verify_otp(request):
         return JsonResponse({'success': False, 'error': 'User not found.'})
 
     login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+    user.failed_login_attempts = 0
+    user.last_login_attempt = timezone.now()
+    user.is_phone_verified = True
+    user.save(update_fields=['failed_login_attempts', 'last_login_attempt', 'is_phone_verified'])
+    _record_login_activity(request, 'otp', 'success', phone, user)
 
     for key in ('otp_phone', 'otp_purpose', 'otp_record_id', 'pending_user_id'):
         request.session.pop(key, None)
@@ -339,6 +459,49 @@ def logout_view(request):
 def forgot_password_view(request):
     """Step 1: Enter phone → send OTP."""
     if request.method == 'POST':
+        identifier = request.POST.get('identifier', '').strip()
+        if identifier:
+            user = None
+            valid_phone, _ = validate_phone(identifier)
+            if valid_phone:
+                phone = normalize_phone(identifier)
+                user = User.objects.filter(phone_number=phone).first()
+            else:
+                user = User.objects.filter(email__iexact=identifier).first()
+                phone = user.phone_number if user else ''
+
+            if not user:
+                return render(request, 'accounts/forgot_password.html', {
+                    'success': 'If this account is registered, an OTP has been sent.',
+                    'identifier': identifier,
+                })
+
+            if not phone:
+                return render(request, 'accounts/forgot_password.html', {
+                    'error': 'This account does not have a phone number. Please contact support.',
+                    'identifier': identifier,
+                })
+
+            if is_rate_limited(phone, 'reset'):
+                return render(request, 'accounts/forgot_password.html', {
+                    'error': 'Please wait 1 minute before requesting another OTP.',
+                    'identifier': identifier,
+                })
+
+            ip = get_client_ip(request)
+            otp_plain, record, result = _send_otp(phone, 'reset', user=user, ip=ip, email=user.email)
+
+            request.session['otp_phone'] = phone
+            request.session['otp_purpose'] = 'reset'
+            request.session['otp_record_id'] = record.id
+            request.session['reset_user_id'] = user.id
+
+            expiry = getattr(settings, 'OTP_EXPIRY_MINUTES', 5)
+            console_otp = otp_plain if (result.get('console') and settings.DEBUG) else None
+
+            return render(request, 'otp_auth/verify_otp.html',
+                          _otp_context(phone, 'reset', expiry, console_otp))
+
         phone_raw = request.POST.get('phone', '').strip()
 
         valid, err = validate_phone(phone_raw)

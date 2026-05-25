@@ -7,6 +7,7 @@ from payments.models import RazorpayPayment
 from otp_auth.models import OTPVerification, SMSLog
 from django.contrib.auth import get_user_model
 from django.db.models import Sum, Count, Q
+from accounts.models import LoginActivity
 from .forms import WatchForm, CategoryForm, OrderStatusForm, BannerForm
 from orders.emails import send_shipping_update, send_out_for_delivery, send_delivered
 import datetime
@@ -165,7 +166,19 @@ def order_update(request, pk):
 @user_passes_test(is_admin)
 def user_list(request):
     users = User.objects.all().order_by('-date_joined')
-    return render(request, 'dashboard/users/list.html', {'users': users})
+    login_history = LoginActivity.objects.select_related('user').order_by('-created_at')[:50]
+    failed_login_count = LoginActivity.objects.filter(status='failed').count()
+    otp_login_count = LoginActivity.objects.filter(method='otp', status='success').count()
+    password_login_count = LoginActivity.objects.filter(method='password', status='success').count()
+    verified_users = User.objects.filter(is_phone_verified=True).count()
+    return render(request, 'dashboard/users/list.html', {
+        'users': users,
+        'login_history': login_history,
+        'failed_login_count': failed_login_count,
+        'otp_login_count': otp_login_count,
+        'password_login_count': password_login_count,
+        'verified_users': verified_users,
+    })
 
 @user_passes_test(is_admin)
 def category_list(request):

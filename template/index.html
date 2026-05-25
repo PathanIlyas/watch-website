@@ -6,6 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CHRONOS | Premium Luxury Watches</title>
     <meta name="description" content="Discover our collection of premium luxury watches. High-end Swiss movement timepieces for the modern connoisseur.">
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link rel="preconnect" href="https://unpkg.com" crossorigin>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preload" href="{% static 'images/hero.png' %}" as="image" fetchpriority="high">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
@@ -16,7 +22,10 @@
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg fixed-top">
         <div class="container">
-            <a class="navbar-brand" href="{% url 'home' %}">CHRONOS</a>
+            <a class="navbar-brand" href="{% url 'home' %}">
+                <img src="{% static 'images/watch_logo_mark.png' %}" alt="" class="brand-logo-img" width="42" height="42">
+                <span>CHRONOS</span>
+            </a>
             <button class="navbar-toggler shadow-none border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <i class="fas fa-bars text-white fs-3"></i>
             </button>
@@ -56,7 +65,7 @@
 
     <!-- Hero Section -->
     <section class="hero">
-        <img src="{% static 'images/hero.png' %}" alt="Luxury Watch" class="hero-bg">
+        <img src="{% static 'images/hero.png' %}" alt="Luxury Watch" class="hero-bg" width="1024" height="1024" fetchpriority="high" decoding="async">
         <div class="hero-overlay"></div>
         <div class="container position-relative z-1">
             <div class="row">
@@ -88,7 +97,9 @@
                     <a href="{% url 'product' watch.slug %}" class="text-decoration-none">
                         <div class="watch-card">
                             <div class="watch-img-wrap">
-                                <img src="{% if watch.images.first %}{{ watch.images.first.image.url }}{% else %}{% static 'images/default_watch.png' %}{% endif %}" alt="{{ watch.name }}">
+                                {% with image=watch.display_images.0 %}
+                                <img src="{% if image %}{{ image.image.url }}{% else %}{% static 'images/black.png' %}{% endif %}" alt="{{ watch.name }}" width="320" height="320" loading="lazy" decoding="async">
+                                {% endwith %}
                             </div>
                             <div class="watch-info">
                                 <h3 class="watch-title text-white">{{ watch.name }}</h3>
@@ -122,7 +133,9 @@
                     <div class="swiper-slide">
                         <div class="watch-card text-center p-3">
                             <div class="watch-img-wrap">
-                                <img src="{% if watch.images.first %}{{ watch.images.first.image.url }}{% else %}{% static 'images/default_watch.png' %}{% endif %}" alt="{{ watch.name }}">
+                                {% with image=watch.display_images.0 %}
+                                <img src="{% if image %}{{ image.image.url }}{% else %}{% static 'images/black.png' %}{% endif %}" alt="{{ watch.name }}" width="320" height="320" loading="lazy" decoding="async">
+                                {% endwith %}
                             </div>
                             <div class="watch-info">
                                 <h3 class="watch-title text-white">{{ watch.name }}</h3>
@@ -144,11 +157,11 @@
     <section class="story-section" style="background-image: linear-gradient(rgba(11,11,11,0.8), rgba(11,11,11,0.8)), url('{% static 'images/hero.png' %}');">
         <div class="container">
             <div class="row justify-content-center">
-                <div class="col-lg-8 text-center glass-effect p-5" data-aos="zoom-in">
+                <div class="col-lg-8 text-center glass-effect p-5">
                     <span class="section-subtitle">Our Heritage</span>
                     <h2 class="section-title text-white mb-4">A Legacy of Precision</h2>
                     <p class="mb-4">Since 1924, CHRONOS has been at the forefront of horological innovation. Every timepiece is a testament to our commitment to craftsmanship, utilizing only the finest materials and masterful Swiss techniques to create watches that transcend time itself.</p>
-                    <img src="{% static 'images/gold.png' %}" alt="Signature" style="height: 60px; object-fit: contain; filter: brightness(0) invert(1) sepia(1) saturate(5) hue-rotate(5deg);">
+                    <div class="story-signature" aria-hidden="true">CHRONOS</div>
                     <div class="mt-4">
                         <a href="{% url 'about' %}" class="btn btn-gold">Read Our Story</a>
                     </div>
@@ -160,35 +173,35 @@
     <!-- Watch Features Section -->
     <section class="section-padding">
         <div class="container">
-            <div class="row mb-5" data-aos="fade-up">
+            <div class="row mb-5">
                 <div class="col-12 text-center">
                     <span class="section-subtitle">Engineering Excellence</span>
                     <h2 class="section-title">The CHRONOS Standard</h2>
                 </div>
             </div>
             <div class="row g-4">
-                <div class="col-md-3 col-sm-6" data-aos="fade-up" data-aos-delay="100">
+                <div class="col-md-3 col-sm-6">
                     <div class="feature-card">
                         <i class="fas fa-cog feature-icon"></i>
                         <h4 class="text-white mb-3">Swiss Movement</h4>
                         <p class="mb-0">Unyielding precision powered by world-renowned Swiss automated mechanics.</p>
                     </div>
                 </div>
-                <div class="col-md-3 col-sm-6" data-aos="fade-up" data-aos-delay="200">
+                <div class="col-md-3 col-sm-6">
                     <div class="feature-card">
                         <i class="fas fa-gem feature-icon"></i>
                         <h4 class="text-white mb-3">Sapphire Glass</h4>
                         <p class="mb-0">Scratch-resistant crystal ensuring your watch face remains pristine forever.</p>
                     </div>
                 </div>
-                <div class="col-md-3 col-sm-6" data-aos="fade-up" data-aos-delay="300">
+                <div class="col-md-3 col-sm-6">
                     <div class="feature-card">
                         <i class="fas fa-water feature-icon"></i>
                         <h4 class="text-white mb-3">Water Resistant</h4>
                         <p class="mb-0">Engineered to withstand depths up to 300 meters, perfect for diving.</p>
                     </div>
                 </div>
-                <div class="col-md-3 col-sm-6" data-aos="fade-up" data-aos-delay="400">
+                <div class="col-md-3 col-sm-6">
                     <div class="feature-card">
                         <i class="fas fa-sync feature-icon"></i>
                         <h4 class="text-white mb-3">Automatic</h4>
@@ -202,7 +215,7 @@
     <!-- Newsletter Section -->
     <section class="section-padding" style="background: #050505;">
         <div class="container">
-            <div class="row justify-content-center" data-aos="fade-up">
+            <div class="row justify-content-center">
                 <div class="col-lg-6 text-center">
                     <h2 class="text-white mb-3">Join The Exclusive Club</h2>
                     <p class="mb-4">Subscribe to receive updates on new releases, exclusive events, and the art of watchmaking.</p>
@@ -220,7 +233,10 @@
         <div class="container">
             <div class="row g-4">
                 <div class="col-lg-4 col-md-6">
-                    <a href="{% url 'home' %}" class="footer-logo">CHRONOS</a>
+                    <a href="{% url 'home' %}" class="footer-logo">
+                        <img src="{% static 'images/watch_logo_mark.png' %}" alt="" class="brand-logo-img" width="36" height="36">
+                        <span>CHRONOS</span>
+                    </a>
                     <p class="pe-lg-4">Crafting luxurious timepieces since 1924. Every watch is a symphony of precision engineering and elegant design.</p>
                     <div class="social-icons mt-4">
                         <a href="#"><i class="fab fa-facebook-f"></i></a>
@@ -259,19 +275,20 @@
                     <p class="mb-0">&copy; 2026 CHRONOS Watches. All Rights Reserved.</p>
                 </div>
                 <div class="col-md-6 text-center text-md-end mt-3 mt-md-0">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" alt="PayPal" style="height: 20px; margin-left: 10px; opacity: 0.5;">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/a/a4/Mastercard_2019_logo.svg" alt="MasterCard" style="height: 20px; margin-left: 10px; opacity: 0.5;">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/0/04/Visa.svg" alt="Visa" style="height: 20px; margin-left: 10px; opacity: 0.5;">
+                    <div class="payment-icons" aria-label="Accepted payment methods">
+                        <i class="fab fa-cc-paypal" title="PayPal"></i>
+                        <i class="fab fa-cc-mastercard" title="MasterCard"></i>
+                        <i class="fab fa-cc-visa" title="Visa"></i>
+                    </div>
                 </div>
             </div>
         </div>
     </footer>
 
     <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <script src="{% static 'js/main.js' %}"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script defer src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script defer src="{% static 'js/main.js' %}"></script>
 </body>
 </html>

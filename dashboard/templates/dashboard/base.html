@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -51,9 +52,17 @@
             padding: 10px 20px;
             margin-bottom: 30px;
             letter-spacing: 2px;
+            gap: 10px;
         }
 
-        .sidebar-brand span {
+        .sidebar-brand img {
+            width: 46px;
+            height: 46px;
+            object-fit: contain;
+            filter: drop-shadow(0 4px 10px rgba(56, 189, 248, 0.22));
+        }
+
+        .sidebar-brand .brand-dot {
             color: var(--accent-gold);
         }
 
@@ -229,7 +238,10 @@
 
     <!-- Sidebar -->
     <div class="sidebar" id="sidebar">
-        <a href="{% url 'dashboard_home' %}" class="sidebar-brand">CHRONOS<span>.</span></a>
+        <a href="{% url 'dashboard_home' %}" class="sidebar-brand">
+            <img src="{% static 'images/watch_logo_mark.png' %}" alt="" width="38" height="38">
+            <span>CHRONOS<span class="brand-dot">.</span></span>
+        </a>
         <ul class="nav flex-column">
             <li class="nav-item">
                 <a class="nav-link {% if request.path == '/dashboard/' %}active{% endif %}" href="{% url 'dashboard_home' %}"><i class="fas fa-th-large"></i> Overview</a>

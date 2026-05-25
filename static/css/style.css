@@ -23,6 +23,11 @@ html {
   scroll-behavior: smooth;
 }
 
+[data-aos]:not(.aos-init) {
+  opacity: 1 !important;
+  transform: none !important;
+}
+
 body {
   font-family: var(--font-body);
   background-color: var(--bg-color);
@@ -124,11 +129,28 @@ p {
 }
 
 .navbar-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
   font-family: var(--font-heading);
   font-size: 2rem;
   font-weight: 700;
   color: var(--text-primary) !important;
   letter-spacing: 2px;
+  line-height: 1;
+}
+
+.brand-logo-img {
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
+  flex: 0 0 auto;
+  filter: drop-shadow(0 4px 10px rgba(212, 175, 55, 0.22));
+}
+
+.navbar-brand .brand-logo-img {
+  width: 50px;
+  height: 50px;
 }
 
 .nav-link {
@@ -179,6 +201,20 @@ p {
   object-fit: cover;
   z-index: -2;
   transform: scale(1.05);
+}
+
+.hero-title,
+.hero .hero-subtitle,
+.hero-btn {
+  animation: hero-reveal 700ms ease-out both;
+}
+
+.hero .hero-subtitle {
+  animation-delay: 120ms;
+}
+
+.hero-btn {
+  animation-delay: 220ms;
 }
 
 .hero-overlay {
@@ -315,12 +351,19 @@ footer {
 }
 
 .footer-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
   font-family: var(--font-heading);
   font-size: 1.8rem;
   color: var(--text-primary);
   text-decoration: none;
   margin-bottom: 20px;
-  display: inline-block;
+}
+
+.footer-logo .brand-logo-img {
+  width: 42px;
+  height: 42px;
 }
 
 .footer-links a {
@@ -399,9 +442,35 @@ footer {
 .story-section {
   position: relative;
   padding: 150px 0;
-  background-attachment: fixed;
+  background-attachment: scroll;
   background-position: center;
   background-size: cover;
+}
+
+.story-signature {
+  color: var(--accent-gold);
+  font-family: var(--font-heading);
+  font-size: 1.75rem;
+  font-style: italic;
+  letter-spacing: 2px;
+}
+
+.payment-icons {
+  color: rgba(245, 245, 245, 0.55);
+  display: inline-flex;
+  gap: 12px;
+  font-size: 1.6rem;
+}
+
+@keyframes hero-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Page Header */
@@ -473,6 +542,14 @@ footer {
 }
 
 @media (max-width: 768px) {
+  .navbar-brand {
+    gap: 8px;
+    font-size: 1.5rem;
+  }
+  .navbar-brand .brand-logo-img {
+    width: 42px;
+    height: 42px;
+  }
   .hero h1 {
     font-size: 2.5rem;
   }
@@ -484,5 +561,18 @@ footer {
   }
   .hero-overlay {
     background: linear-gradient(180deg, rgba(11,11,11,0.5) 0%, rgba(11,11,11,0.9) 100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    transition-duration: 1ms !important;
   }
 }

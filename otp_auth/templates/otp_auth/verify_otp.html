@@ -24,7 +24,8 @@
     }
     .wrapper { width:100%; max-width:440px; padding:20px; }
     .brand { text-align:center; margin-bottom:36px; }
-    .brand-name { font-family:'Playfair Display',serif; font-size:2rem; font-weight:700; letter-spacing:8px; color:var(--gold); }
+    .brand-name { font-family:'Playfair Display',serif; font-size:2rem; font-weight:700; letter-spacing:8px; color:var(--gold); display:inline-flex; align-items:center; justify-content:center; gap:12px; line-height:1; }
+    .brand-logo-img { width:54px; height:54px; object-fit:contain; filter:drop-shadow(0 4px 10px rgba(212,175,55,.22)); }
     .brand-tag  { font-size:.68rem; letter-spacing:4px; text-transform:uppercase; color:rgba(160,160,160,.55); margin-top:5px; }
     .brand-line { width:48px; height:1px; background:var(--gold); margin:12px auto 0; opacity:.5; }
     .card {
@@ -105,7 +106,10 @@
 <body>
 <div class="wrapper">
   <div class="brand">
-    <div class="brand-name">CHRONOS</div>
+    <div class="brand-name">
+      <img src="{% static 'images/watch_logo_mark.png' %}" alt="" class="brand-logo-img" width="54" height="54">
+      <span>CHRONOS</span>
+    </div>
     <div class="brand-tag">Precision · Elegance · Legacy</div>
     <div class="brand-line"></div>
   </div>
@@ -167,9 +171,19 @@
     </div>
   </div>
 
-  <a href="{% url 'otp_send' %}" class="back-link">
-    <i class="fas fa-arrow-left me-1"></i>Change phone number
-  </a>
+  {% if purpose == 'register' %}
+    <a href="{% url 'register' %}" class="back-link">
+      <i class="fas fa-arrow-left me-1"></i>Back to registration
+    </a>
+  {% elif purpose == 'reset' %}
+    <a href="{% url 'forgot_password' %}" class="back-link">
+      <i class="fas fa-arrow-left me-1"></i>Back to password reset
+    </a>
+  {% else %}
+    <a href="{% url 'otp_send' %}?purpose={{ purpose }}" class="back-link">
+      <i class="fas fa-arrow-left me-1"></i>Change phone number
+    </a>
+  {% endif %}
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
