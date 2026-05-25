@@ -10,6 +10,7 @@ python = sys.executable
 steps = [
     ([python, 'manage.py', 'migrate'],             'Applying migrations...'),
     ([python, 'manage.py', 'create_admin'],         'Creating admin user...'),
+    ([python, 'manage.py', 'seed_watches'],         'Seeding watch collection...'),
     ([python, 'manage.py', 'collectstatic',
       '--noinput', '--clear'],                       'Collecting static files...'),
 ]
