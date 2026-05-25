@@ -10,20 +10,25 @@ import mimetypes
 
 env = environ.Env(DEBUG=(bool, False))
 
+
+def clean_env(name, default=''):
+    value = env(name, default=default)
+    return value.strip() if isinstance(value, str) else value
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
 # ─── Security ─────────────────────────────────────────────────
-SECRET_KEY = env('SECRET_KEY', default='django-insecure-fallback-key-change-in-production')
+SECRET_KEY = clean_env('SECRET_KEY', default='django-insecure-fallback-key-change-in-production')
 DEBUG = env('DEBUG', default=False)
-ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['*'])
-RENDER_EXTERNAL_HOSTNAME = env('RENDER_EXTERNAL_HOSTNAME', default=None)
+ALLOWED_HOSTS = [host.strip() for host in env.list('ALLOWED_HOSTS', default=['*']) if host.strip()]
+RENDER_EXTERNAL_HOSTNAME = clean_env('RENDER_EXTERNAL_HOSTNAME', default=None)
 if RENDER_EXTERNAL_HOSTNAME and RENDER_EXTERNAL_HOSTNAME not in ALLOWED_HOSTS:
     ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
 if not DEBUG:
     ALLOWED_HOSTS.extend(['.onrender.com', 'localhost', '127.0.0.1'])
     ALLOWED_HOSTS = list(dict.fromkeys(ALLOWED_HOSTS))
-CSRF_TRUSTED_ORIGINS = env.list('CSRF_TRUSTED_ORIGINS', default=[])
+CSRF_TRUSTED_ORIGINS = [origin.strip() for origin in env.list('CSRF_TRUSTED_ORIGINS', default=[]) if origin.strip()]
 if RENDER_EXTERNAL_HOSTNAME:
     CSRF_TRUSTED_ORIGINS.append(f'https://{RENDER_EXTERNAL_HOSTNAME}')
 if not DEBUG:
@@ -93,9 +98,13 @@ WSGI_APPLICATION = 'core.wsgi.application'
 # ─── Database ─────────────────────────────────────────────────
 import dj_database_url
 
+DATABASE_URL = clean_env('DATABASE_URL', default='')
+if RENDER_EXTERNAL_HOSTNAME and DATABASE_URL.startswith('sqlite'):
+    DATABASE_URL = ''
+
 DATABASES = {
     'default': dj_database_url.config(
-        default=env('DATABASE_URL', default=f'sqlite:///{BASE_DIR}/db.sqlite3'),
+        default=DATABASE_URL or f'sqlite:///{BASE_DIR}/db.sqlite3',
         conn_max_age=600,
     )
 }
@@ -154,21 +163,21 @@ EMAIL_BACKEND = env('EMAIL_BACKEND', default='django.core.mail.backends.smtp.Ema
 EMAIL_HOST = env('EMAIL_HOST', default='smtp.gmail.com')
 EMAIL_PORT = env.int('EMAIL_PORT', default=587)
 EMAIL_USE_TLS = env.bool('EMAIL_USE_TLS', default=True)
-EMAIL_HOST_USER = env('EMAIL_HOST_USER', default='')
-EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD', default='')
-DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL', default='CHRONOS Luxury Watches <noreply@chronos.com>')
-ADMIN_EMAIL = env('ADMIN_EMAIL', default='admin@chronos.com')
+EMAIL_HOST_USER = clean_env('EMAIL_HOST_USER', default='')
+EMAIL_HOST_PASSWORD = clean_env('EMAIL_HOST_PASSWORD', default='')
+DEFAULT_FROM_EMAIL = clean_env('DEFAULT_FROM_EMAIL', default='CHRONOS Luxury Watches <noreply@chronos.com>')
+ADMIN_EMAIL = clean_env('ADMIN_EMAIL', default='admin@chronos.com') or 'admin@chronos.com'
 
 # ─── Auto Admin ───────────────────────────────────────────────
-ADMIN_USERNAME = env('ADMIN_USERNAME', default='admin')
-ADMIN_PASSWORD = env('ADMIN_PASSWORD', default='admin')
+ADMIN_USERNAME = clean_env('ADMIN_USERNAME', default='admin') or 'admin'
+ADMIN_PASSWORD = clean_env('ADMIN_PASSWORD', default='admin') or 'admin'
 
 # ─── OTP / SMS ────────────────────────────────────────────────
-SMS_PROVIDER           = env('SMS_PROVIDER', default='console')
-FAST2SMS_API_KEY       = env('FAST2SMS_API_KEY', default='your_fast2sms_api_key_here')
-TWILIO_ACCOUNT_SID     = env('TWILIO_ACCOUNT_SID', default='')
-TWILIO_AUTH_TOKEN      = env('TWILIO_AUTH_TOKEN', default='')
-TWILIO_PHONE_NUMBER    = env('TWILIO_PHONE_NUMBER', default='')
+SMS_PROVIDER           = clean_env('SMS_PROVIDER', default='console').lower()
+FAST2SMS_API_KEY       = clean_env('FAST2SMS_API_KEY', default='your_fast2sms_api_key_here')
+TWILIO_ACCOUNT_SID     = clean_env('TWILIO_ACCOUNT_SID', default='')
+TWILIO_AUTH_TOKEN      = clean_env('TWILIO_AUTH_TOKEN', default='')
+TWILIO_PHONE_NUMBER    = clean_env('TWILIO_PHONE_NUMBER', default='')
 OTP_EXPIRY_MINUTES     = env.int('OTP_EXPIRY_MINUTES', default=5)
 OTP_MAX_ATTEMPTS       = env.int('OTP_MAX_ATTEMPTS', default=5)
 OTP_RATE_LIMIT_MINUTES = env.int('OTP_RATE_LIMIT_MINUTES', default=1)
@@ -176,4 +185,25 @@ OTP_RATE_LIMIT_MINUTES = env.int('OTP_RATE_LIMIT_MINUTES', default=1)
 # ─── Brand ────────────────────────────────────────────────────
 BRAND_NAME = 'CHRONOS'
 BRAND_TAGLINE = 'Precision. Elegance. Legacy.'
-SITE_URL = env('SITE_URL', default='http://localhost:8000')
+SITE_URL = clean_env('SITE_URL', default='http://localhost:8000')
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'INFO',
+        },
+        'django.request': {
+            'handlers': ['console'],
+            'level': 'ERROR',
+            'propagate': False,
+        },
+    },
+}

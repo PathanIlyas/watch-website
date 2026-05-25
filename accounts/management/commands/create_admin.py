@@ -18,9 +18,9 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         User = get_user_model()
 
-        username = getattr(settings, 'ADMIN_USERNAME', 'admin')
-        email    = getattr(settings, 'ADMIN_EMAIL',    'admin@chronos.com')
-        password = getattr(settings, 'ADMIN_PASSWORD', 'admin')
+        username = (getattr(settings, 'ADMIN_USERNAME', 'admin') or 'admin').strip()
+        email = (getattr(settings, 'ADMIN_EMAIL', 'admin@chronos.com') or 'admin@chronos.com').strip()
+        password = (getattr(settings, 'ADMIN_PASSWORD', 'admin') or 'admin').strip()
 
         if not username or not password:
             self.stderr.write(self.style.ERROR(

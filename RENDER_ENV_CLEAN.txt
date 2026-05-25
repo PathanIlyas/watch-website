@@ -1,0 +1,14 @@
+DEBUG=False
+ALLOWED_HOSTS=.onrender.com
+CSRF_TRUSTED_ORIGINS=https://*.onrender.com
+SMS_PROVIDER=console
+ADMIN_USERNAME=admin
+ADMIN_EMAIL=admin@example.com
+ADMIN_PASSWORD=change-this-password
+SITE_URL=https://your-app-name.onrender.com
+
+# Do not add DATABASE_URL manually.
+# Render creates it automatically from the chronos-db database.
+#
+# Do not paste core/settings.py code here.
+# Environment values must only be KEY=value lines.
