@@ -158,7 +158,7 @@ SIMPLE_JWT = {
 RAZORPAY_KEY_ID = env('RAZORPAY_KEY_ID', default='rzp_test_placeholder')
 RAZORPAY_KEY_SECRET = env('RAZORPAY_KEY_SECRET', default='placeholder_secret')
 
-# ─── Email / SMTP ─────────────────────────────────────────────
+# ─── Email Settings (SMTP and HTTP APIs) ──────────────────────
 EMAIL_BACKEND = env('EMAIL_BACKEND', default='django.core.mail.backends.smtp.EmailBackend')
 EMAIL_HOST = env('EMAIL_HOST', default='smtp.gmail.com')
 EMAIL_PORT = env.int('EMAIL_PORT', default=587)
@@ -168,6 +168,11 @@ EMAIL_HOST_PASSWORD = clean_env('EMAIL_HOST_PASSWORD', default='')
 DEFAULT_FROM_EMAIL = clean_env('DEFAULT_FROM_EMAIL', default='CHRONOS Luxury Watches <noreply@chronos.com>')
 ADMIN_EMAIL = clean_env('ADMIN_EMAIL', default='admin@chronos.com') or 'admin@chronos.com'
 EMAIL_TIMEOUT = 10
+
+# API keys for HTTP-based custom email backends (to bypass Render's Free SMTP blocking)
+BREVO_API_KEY = clean_env('BREVO_API_KEY', default='')
+RESEND_API_KEY = clean_env('RESEND_API_KEY', default='')
+
 
 # ─── Auto Admin ───────────────────────────────────────────────
 ADMIN_USERNAME = clean_env('ADMIN_USERNAME', default='admin') or 'admin'
