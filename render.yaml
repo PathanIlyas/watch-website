@@ -27,15 +27,15 @@ services:
       - key: ADMIN_PASSWORD
         value: ChangeMe123!
       - key: EMAIL_HOST_USER
-        value: ""
+        value: "ilyas.khan.waytoweb@gmail.com"
       - key: EMAIL_HOST_PASSWORD
-        value: ""
+        value: "awne zyuo jotw ophx"
       - key: DEFAULT_FROM_EMAIL
         value: CHRONOS Luxury Watches <noreply@example.com>
       - key: RAZORPAY_KEY_ID
-        value: ""
+        value: "rzp_test_SsJC0KFuJLu5dG"
       - key: RAZORPAY_KEY_SECRET
-        value: ""
+        value: "P8KzjJhIuMGWbhJn0jTU3OBZ"
       - key: SMS_PROVIDER
         value: console
 
