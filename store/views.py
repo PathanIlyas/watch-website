@@ -22,6 +22,14 @@ def attach_display_images(watches):
         image_name = STATIC_WATCH_IMAGES.get(watch.slug)
         if image_name:
             watch.display_image_src = static(f'images/{image_name}')
+            # Set static_url for all individual images/thumbnails of static-seeded watches
+            for img in getattr(watch, 'display_images', []):
+                img.static_url = static(f'images/{image_name}')
+            try:
+                for img in watch.images.all():
+                    img.static_url = static(f'images/{image_name}')
+            except Exception:
+                pass
             continue
 
         images = getattr(watch, 'display_images', [])

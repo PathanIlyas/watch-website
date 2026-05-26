@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from store.models import Watch
+from store.views import attach_display_images
 from .models import Cart, CartItem, Order, OrderItem, Payment, OrderStatusHistory
 
 
@@ -18,6 +19,8 @@ def get_cart(request):
 def cart(request):
     cart = get_cart(request)
     items = cart.items.select_related('watch').all()
+    watches = [item.watch for item in items]
+    attach_display_images(watches)
     total = sum(item.watch.price * item.quantity for item in items)
     return render(request, 'cart.html', {'items': items, 'total': total})
 

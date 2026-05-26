@@ -81,7 +81,7 @@
                     <div class="row align-items-center cart-item mb-3">
                         <div class="col-12 col-md-6 d-flex align-items-center mb-3 mb-md-0">
                             <a href="{% url 'remove_from_cart' item.id %}" class="text-secondary me-3"><i class="fas fa-times"></i></a>
-                            <img src="{% if item.watch.images.first %}{{ item.watch.images.first.image.url }}{% else %}{% static 'images/default_watch.png' %}{% endif %}" alt="{{ item.watch.name }}" class="cart-img me-3">
+                            <img src="{{ item.watch.display_image_src }}" alt="{{ item.watch.name }}" class="cart-img me-3">
                             <div>
                                 <a href="{% url 'product' item.watch.slug %}" class="text-white text-decoration-none fw-bold">{{ item.watch.name }}</a>
                                 <p class="mb-0 text-secondary" style="font-size: 0.8rem;">Category: {{ item.watch.category.name }}</p>

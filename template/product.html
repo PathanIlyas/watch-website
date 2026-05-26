@@ -77,8 +77,8 @@
                     <div class="row g-3 mt-1">
                         {% for img in watch.images.all %}
                         <div class="col-4">
-                            <div class="product-gallery-img p-3 {% if forloop.first %}border-gold{% endif %}" {% if forloop.first %}style="border-color: var(--accent-gold);"{% endif %} onclick="document.getElementById('mainProductImage').src='{{ img.image.url }}'">
-                                <img src="{{ img.image.url }}" alt="Thumb" class="img-fluid">
+                            <div class="product-gallery-img p-3 {% if forloop.first %}border-gold{% endif %}" {% if forloop.first %}style="border-color: var(--accent-gold);"{% endif %} onclick="document.getElementById('mainProductImage').src='{% if img.static_url %}{{ img.static_url }}{% else %}{{ img.image.url }}{% endif %}'">
+                                <img src="{% if img.static_url %}{{ img.static_url }}{% else %}{{ img.image.url }}{% endif %}" alt="Thumb" class="img-fluid">
                             </div>
                         </div>
                         {% endfor %}

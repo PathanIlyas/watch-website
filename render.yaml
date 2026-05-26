@@ -37,7 +37,8 @@ services:
       - key: RAZORPAY_KEY_SECRET
         value: "P8KzjJhIuMGWbhJn0jTU3OBZ"
       - key: SMS_PROVIDER
-        value: console
+        value: email
+
 
 databases:
   - name: chronos-db
