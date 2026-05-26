@@ -167,6 +167,7 @@ EMAIL_HOST_USER = clean_env('EMAIL_HOST_USER', default='')
 EMAIL_HOST_PASSWORD = clean_env('EMAIL_HOST_PASSWORD', default='')
 DEFAULT_FROM_EMAIL = clean_env('DEFAULT_FROM_EMAIL', default='CHRONOS Luxury Watches <noreply@chronos.com>')
 ADMIN_EMAIL = clean_env('ADMIN_EMAIL', default='admin@chronos.com') or 'admin@chronos.com'
+EMAIL_TIMEOUT = 10
 
 # ─── Auto Admin ───────────────────────────────────────────────
 ADMIN_USERNAME = clean_env('ADMIN_USERNAME', default='admin') or 'admin'

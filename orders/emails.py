@@ -3,6 +3,7 @@ CHRONOS Luxury Watches — Centralised Email System
 All branded HTML emails are built here and sent via Django's email backend.
 """
 import logging
+import threading
 from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
 from django.utils import timezone
@@ -147,8 +148,8 @@ def _info_row(label: str, value: str) -> str:
 # ─────────────────────────────────────────────────────────────────────────────
 # Core send helper
 # ─────────────────────────────────────────────────────────────────────────────
-def _send(subject: str, to: str, html: str, text: str = ''):
-    """Send a single HTML email. Falls back to plain text."""
+def _send_sync(subject: str, to: str, html: str, text: str = ''):
+    """Send a single HTML email. Falls back to plain text (synchronous, run inside a thread)."""
     try:
         msg = EmailMultiAlternatives(
             subject=subject,
@@ -163,6 +164,14 @@ def _send(subject: str, to: str, html: str, text: str = ''):
     except Exception as exc:
         logger.error('[EMAIL] Failed to send "%s" → %s: %s', subject, to, exc)
         return False
+
+
+def _send(subject: str, to: str, html: str, text: str = ''):
+    """Asynchronously dispatch email in a background thread to prevent blocking HTTP requests."""
+    thread = threading.Thread(target=_send_sync, args=(subject, to, html, text))
+    thread.daemon = True
+    thread.start()
+    return True
 
 
 # ─────────────────────────────────────────────────────────────────────────────
