@@ -418,7 +418,7 @@ def checkout_send_otp(request):
     user = request.user if request.user.is_authenticated else None
     ip   = get_client_ip(request)
     otp_plain, record = create_otp_record(phone, 'checkout', user=user, ip=ip)
-    customer_email = getattr(user, 'email', '') if user else ''
+    customer_email = data.get('email', '').strip() or (getattr(user, 'email', '') if user else '')
     result = send_otp_sms(phone, otp_plain, customer_email=customer_email)
 
     if not result.get('success'):
