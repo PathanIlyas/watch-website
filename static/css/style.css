@@ -614,3 +614,224 @@ footer {
     transition-duration: 1ms !important;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   CHRONOS — Mobile-First Responsive Fixes
+   Only CSS — zero logic changes
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Base mobile resets ─────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+html { overflow-x: hidden; }
+body { overflow-x: hidden; min-width: 320px; }
+img  { max-width: 100%; height: auto; display: block; }
+
+/* ── Navbar ─────────────────────────────────────────────────── */
+@media (max-width: 991px) {
+  .navbar { padding: 10px 0; background: rgba(11,11,11,.97) !important; }
+  .navbar-brand { font-size: 1.3rem !important; }
+  .navbar-brand .brand-logo-img { width: 36px !important; height: 36px !important; }
+  .navbar-toggler { padding: 4px 8px; }
+  .navbar-collapse {
+    background: rgba(11,11,11,.98);
+    padding: 16px 20px 20px;
+    border-top: 1px solid rgba(212,175,55,.15);
+    margin-top: 8px;
+  }
+  .navbar-nav .nav-link {
+    margin: 4px 0;
+    padding: 8px 0 !important;
+    font-size: .85rem;
+    border-bottom: 1px solid rgba(255,255,255,.04);
+  }
+  .navbar-nav .nav-link:last-child { border-bottom: none; }
+  /* Auth buttons in mobile menu */
+  .navbar-collapse .d-flex {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 8px !important;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(255,255,255,.06);
+  }
+  .navbar-collapse .d-flex a { width: 100%; text-align: center; }
+}
+
+/* ── Hero ───────────────────────────────────────────────────── */
+@media (max-width: 767px) {
+  .hero { min-height: 100svh; align-items: flex-end; padding-bottom: 60px; }
+  .hero h1, .hero-title { font-size: 2.2rem !important; line-height: 1.2; }
+  .hero p, .hero .hero-subtitle { font-size: 1rem !important; }
+  .hero .d-flex { flex-direction: column; gap: 12px !important; }
+  .hero .btn-gold, .hero .btn-outline-gold { width: 100%; text-align: center; }
+  .hero-overlay {
+    background: linear-gradient(180deg,rgba(11,11,11,.3) 0%,rgba(11,11,11,.92) 100%) !important;
+  }
+}
+@media (max-width: 480px) {
+  .hero h1, .hero-title { font-size: 1.9rem !important; }
+}
+
+/* ── Section spacing ────────────────────────────────────────── */
+@media (max-width: 767px) {
+  .section-padding { padding: 50px 0; }
+  .section-title   { font-size: 1.75rem !important; }
+  .page-header     { padding: 110px 0 45px; }
+  .page-header h1  { font-size: 1.8rem !important; }
+}
+
+/* ── Watch cards ────────────────────────────────────────────── */
+@media (max-width: 575px) {
+  .watch-card { margin-bottom: 4px; }
+  .watch-title { font-size: 1rem; min-height: auto; }
+  .watch-price { font-size: 1rem; }
+  .watch-info  { padding: 14px; }
+  .watch-img-wrap img { padding: 12px; }
+}
+
+/* ── Feature cards ──────────────────────────────────────────── */
+@media (max-width: 575px) {
+  .feature-card { padding: 28px 20px; }
+  .feature-icon { font-size: 2rem; }
+}
+
+/* ── Story section ──────────────────────────────────────────── */
+@media (max-width: 767px) {
+  .story-section { padding: 80px 0; }
+  .story-section .glass-effect { padding: 30px 20px !important; }
+  .story-signature { font-size: 1.4rem; }
+}
+
+/* ── Newsletter ─────────────────────────────────────────────── */
+@media (max-width: 575px) {
+  .newsletter-form,
+  section .d-flex.gap-2 {
+    flex-direction: column !important;
+    gap: 10px !important;
+  }
+  section .d-flex.gap-2 .form-control { width: 100%; }
+  section .d-flex.gap-2 .btn { width: 100%; }
+}
+
+/* ── Footer ─────────────────────────────────────────────────── */
+@media (max-width: 767px) {
+  footer { padding: 50px 0 24px; }
+  .footer-logo { font-size: 1.4rem; }
+  .social-icons { margin-top: 16px !important; }
+  .social-icons a { width: 36px; height: 36px; }
+}
+
+/* ── Cart page ──────────────────────────────────────────────── */
+@media (max-width: 767px) {
+  .cart-img { width: 60px; height: 60px; }
+  .order-summary { padding: 20px; }
+}
+
+/* ── Collection page ────────────────────────────────────────── */
+@media (max-width: 575px) {
+  .col-md-6.col-lg-4 { padding: 0 8px; }
+}
+
+/* ── Product detail ─────────────────────────────────────────── */
+@media (max-width: 767px) {
+  .product-gallery-img { padding: 24px; }
+}
+
+/* ── Checkout page ──────────────────────────────────────────── */
+@media (max-width: 767px) {
+  /* Sticky order summary — remove sticky on mobile */
+  .order-summary.sticky-top { position: relative !important; top: auto !important; }
+  /* OTP modal boxes */
+  .modal-otp-box { width: 40px !important; height: 50px !important; font-size: 1.2rem !important; }
+}
+@media (max-width: 400px) {
+  .modal-otp-box { width: 34px !important; height: 44px !important; font-size: 1rem !important; }
+}
+
+/* ── OTP pages (send_otp / verify_otp) ─────────────────────── */
+@media (max-width: 480px) {
+  .otp-inputs { gap: 6px !important; }
+  .otp-box    { width: 44px !important; height: 54px !important; font-size: 1.3rem !important; }
+  .wrapper    { padding: 16px !important; }
+  .card       { padding: 28px 20px 24px !important; }
+}
+@media (max-width: 360px) {
+  .otp-box { width: 38px !important; height: 48px !important; font-size: 1.1rem !important; }
+}
+
+/* ── Auth pages (login / register / forgot) ─────────────────── */
+@media (max-width: 480px) {
+  .login-card, .card { padding: 28px 20px 24px !important; }
+  .brand-name { font-size: 1.7rem !important; letter-spacing: 5px !important; }
+}
+
+/* ── Track order page ───────────────────────────────────────── */
+@media (max-width: 767px) {
+  /* Timeline — stack vertically on very small screens */
+  .timeline-track { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 8px; }
+  .step-item      { min-width: 70px; }
+  .step-icon      { width: 38px !important; height: 38px !important; font-size: .85rem !important; }
+  .step-label     { font-size: .65rem !important; }
+  .timeline-track::before { top: 19px !important; }
+  .timeline-progress      { top: 19px !important; }
+}
+
+/* ── Dashboard sidebar ──────────────────────────────────────── */
+@media (max-width: 991px) {
+  .sidebar { transform: translateX(-100%); transition: transform .3s ease; }
+  .sidebar.show { transform: translateX(0); }
+  .main-content { margin-left: 0 !important; padding: 16px !important; }
+  .top-navbar { padding: 12px 16px !important; }
+  .search-bar { width: 160px !important; }
+}
+
+/* ── Dashboard tables — horizontal scroll on mobile ─────────── */
+@media (max-width: 767px) {
+  .glass-card { padding: 16px !important; border-radius: 12px !important; }
+  .table-responsive { -webkit-overflow-scrolling: touch; }
+  .table td, .table th { white-space: nowrap; font-size: .8rem; padding: 10px 12px !important; }
+}
+
+/* ── Payments success / failed pages ───────────────────────── */
+@media (max-width: 575px) {
+  .success-ring, .fail-ring { width: 90px !important; height: 90px !important; }
+  .success-ring i, .fail-ring i { font-size: 2.2rem !important; }
+  .order-card { padding: 20px 16px !important; }
+  .product-img { width: 44px !important; height: 44px !important; }
+}
+
+/* ── Profile page ───────────────────────────────────────────── */
+@media (max-width: 575px) {
+  .avatar { width: 60px !important; height: 60px !important; font-size: 1.5rem !important; }
+  .order-row { padding: 12px 14px !important; }
+}
+
+/* ── Contact page ───────────────────────────────────────────── */
+@media (max-width: 767px) {
+  .info-card { padding: 14px 16px !important; }
+}
+
+/* ── Buttons — full width on small screens ──────────────────── */
+@media (max-width: 480px) {
+  .btn-gold, .btn-outline-gold {
+    padding: 12px 20px;
+    font-size: .85rem;
+  }
+}
+
+/* ── Swiper — touch friendly ────────────────────────────────── */
+.swiper { touch-action: pan-y; }
+.swiper-slide { height: auto; }
+
+/* ── Prevent text overflow ──────────────────────────────────── */
+@media (max-width: 575px) {
+  h1, h2, h3, h4 { word-break: break-word; }
+  p { font-size: .9rem; }
+  code { word-break: break-all; }
+}
+
+/* ── Safe area for notched phones ───────────────────────────── */
+@supports (padding: max(0px)) {
+  .navbar { padding-left: max(0px, env(safe-area-inset-left)); padding-right: max(0px, env(safe-area-inset-right)); }
+  footer  { padding-bottom: max(24px, env(safe-area-inset-bottom)); }
+}
