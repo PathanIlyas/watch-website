@@ -28,6 +28,32 @@ class Watch(models.Model):
     def __str__(self):
         return self.name
 
+    @property
+    def display_image_src(self):
+        static_images = {
+            'chronos-aureus-premium': 'premium_gold.png',
+            'chronos-argentum-elite': 'premium_silver.png',
+            'chronos-obsidian-stealth': 'premium_black.png',
+            'chronos-heritage-gold': 'gold.png',
+            'chronos-aviator-silver': 'silver.png',
+            'chronos-phantom-black': 'black.png',
+        }
+        image_name = static_images.get(self.slug)
+        from django.templatetags.static import static
+        if image_name:
+            return static(f'images/{image_name}')
+        
+        # Check database images
+        primary = self.images.filter(is_primary=True).first()
+        if primary:
+            return primary.image.url
+        first = self.images.first()
+        if first:
+            return first.image.url
+        
+        # fallback
+        return static('images/watch_logo_mark.png')
+
 class WatchImage(models.Model):
     watch = models.ForeignKey(Watch, on_delete=models.CASCADE, related_name='images')
     image = models.ImageField(upload_to='watches/')

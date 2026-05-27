@@ -306,13 +306,7 @@
                     {% for item in items %}
                     <div class="d-flex align-items-center mb-4 {% if not forloop.last %}pb-4{% endif %}" style="{% if not forloop.last %}border-bottom:1px solid rgba(255,255,255,0.06);{% endif %}">
                         <div class="position-relative me-3 flex-shrink-0">
-                            {% if item.watch.images.first %}
-                                <img src="{{ item.watch.images.first.image.url }}" alt="{{ item.watch.name }}" class="cart-item-img">
-                            {% else %}
-                                <div class="cart-item-img d-flex align-items-center justify-content-center" style="background:#2a2a2a;">
-                                    <i class="fas fa-clock text-secondary"></i>
-                                </div>
-                            {% endif %}
+                            <img src="{{ item.watch.display_image_src }}" alt="{{ item.watch.name }}" class="cart-item-img">
                             <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill" style="background:var(--accent-gold);color:#000;font-size:0.65rem;">{{ item.quantity }}</span>
                         </div>
                         <div class="flex-grow-1">

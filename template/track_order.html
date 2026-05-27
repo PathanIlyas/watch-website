@@ -241,11 +241,7 @@
           <h5 class="mb-4">Items in This Order</h5>
           {% for item in order.items.all %}
           <div class="d-flex align-items-center gap-3 py-3 {% if not forloop.last %}border-bottom{% endif %}" style="border-color:rgba(255,255,255,.06);">
-            {% if item.watch.images.first %}
-              <img src="{{ item.watch.images.first.image.url }}" alt="{{ item.watch.name }}" class="product-img">
-            {% else %}
-              <div class="product-img d-flex align-items-center justify-content-center" style="background:#2a2a2a;"><i class="fas fa-clock text-secondary"></i></div>
-            {% endif %}
+            <img src="{{ item.watch.display_image_src }}" alt="{{ item.watch.name }}" class="product-img">
             <div class="flex-grow-1">
               <p class="text-white mb-0 fw-500">{{ item.watch.name }}</p>
               <p class="text-secondary mb-0" style="font-size:.82rem;">{{ item.watch.brand }} &bull; Qty: {{ item.quantity }}</p>
