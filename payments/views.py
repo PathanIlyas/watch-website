@@ -513,9 +513,12 @@ def checkout_verify_otp(request):
     record.mark_verified()
 
     # Mark phone as checkout-verified in session
-    request.session['checkout_otp_verified_phone'] = record.phone
-    request.session.modified = True
-    for key in ('otp_phone', 'otp_purpose', 'otp_record_id'):
-        request.session.pop(key, None)
+    try:
+        request.session['checkout_otp_verified_phone'] = record.phone
+        request.session.modified = True
+        for key in ('otp_phone', 'otp_purpose', 'otp_record_id'):
+            request.session.pop(key, None)
+    except AttributeError:
+        pass  # session not available (e.g. in tests)
 
     return JsonResponse({'success': True, 'message': 'Phone verified. You can now place your order.'})

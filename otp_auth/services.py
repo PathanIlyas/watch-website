@@ -13,7 +13,7 @@ Admin/developer number is NEVER used.
 import logging
 import requests
 from django.conf import settings
-from django.core.mail import send_mail
+from django.core.mail import EmailMultiAlternatives
 from .models import SMSLog
 
 logger = logging.getLogger(__name__)
@@ -24,16 +24,138 @@ OTP_MESSAGE = (
 )
 
 OTP_EMAIL_SUBJECT = "CHRONOS — Your Verification Code"
-OTP_EMAIL_BODY = """
-Your CHRONOS verification code is:
 
-  {otp}
+# ── Luxury HTML OTP Email ─────────────────────────────────────────────
+def _build_otp_email_html(otp: str, minutes: int) -> str:
+    year = __import__('datetime').datetime.now().year
+    digits = ''.join(
+        f'<td style="padding:0 6px;"><div style="'
+        f'width:52px;height:64px;background:#1A1A1A;border:2px solid #D4AF37;'
+        f'border-radius:10px;display:inline-block;text-align:center;'
+        f'line-height:64px;font-size:28px;font-weight:700;color:#D4AF37;'
+        f'font-family:Georgia,serif;letter-spacing:0;">{d}</div></td>'
+        for d in str(otp)
+    )
+    return f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CHRONOS — Verification Code</title>
+</head>
+<body style="margin:0;padding:0;background:#0B0B0B;font-family:'Helvetica Neue',Arial,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#0B0B0B;padding:40px 20px;">
+<tr><td align="center">
+<table width="560" cellpadding="0" cellspacing="0" style="max-width:560px;width:100%;">
 
-This code is valid for {minutes} minutes.
-Do not share this code with anyone.
+  <!-- HEADER -->
+  <tr>
+    <td align="center" style="padding:40px 0 30px;">
+      <div style="font-size:34px;font-weight:900;letter-spacing:10px;color:#D4AF37;
+                  font-family:Georgia,serif;">CHRONOS</div>
+      <div style="font-size:11px;letter-spacing:4px;color:#666;margin-top:6px;
+                  text-transform:uppercase;">Precision · Elegance · Legacy</div>
+      <div style="width:60px;height:2px;background:#D4AF37;margin:18px auto 0;opacity:.7;"></div>
+    </td>
+  </tr>
 
-— CHRONOS Luxury Watches
-"""
+  <!-- CARD -->
+  <tr>
+    <td style="background:#1A1A1A;border-radius:18px;border:1px solid rgba(212,175,55,0.25);
+               padding:44px 40px 36px;box-shadow:0 20px 60px rgba(0,0,0,0.7);">
+
+      <!-- Icon -->
+      <div style="text-align:center;margin-bottom:24px;">
+        <div style="display:inline-block;width:64px;height:64px;border-radius:50%;
+                    background:rgba(212,175,55,0.1);border:2px solid rgba(212,175,55,0.3);
+                    line-height:64px;font-size:28px;">🔐</div>
+      </div>
+
+      <!-- Title -->
+      <h2 style="color:#F5F5F5;font-family:Georgia,serif;font-size:24px;
+                 text-align:center;margin:0 0 8px;">Verification Code</h2>
+      <p style="color:#888;font-size:14px;text-align:center;margin:0 0 32px;line-height:1.6;">
+        Use the code below to verify your identity.<br>
+        Do <strong style="color:#F5F5F5;">not</strong> share this code with anyone.
+      </p>
+
+      <!-- OTP Digits -->
+      <div style="text-align:center;margin:0 0 28px;">
+        <table cellpadding="0" cellspacing="0" style="display:inline-table;">
+          <tr>{digits}</tr>
+        </table>
+      </div>
+
+      <!-- Divider -->
+      <div style="border-top:1px solid rgba(255,255,255,0.07);margin:28px 0;"></div>
+
+      <!-- Expiry info -->
+      <table width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+          <td style="background:rgba(212,175,55,0.07);border:1px solid rgba(212,175,55,0.15);
+                     border-radius:10px;padding:16px 20px;">
+            <table width="100%" cellpadding="0" cellspacing="0">
+              <tr>
+                <td style="width:32px;vertical-align:top;padding-top:2px;">
+                  <span style="font-size:18px;">⏱</span>
+                </td>
+                <td style="padding-left:10px;">
+                  <p style="color:#D4AF37;font-size:13px;font-weight:600;margin:0 0 3px;">
+                    Expires in {minutes} minutes
+                  </p>
+                  <p style="color:#888;font-size:12px;margin:0;line-height:1.5;">
+                    This code is single-use and will expire automatically.
+                    If you did not request this, please ignore this email.
+                  </p>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+
+      <!-- Divider -->
+      <div style="border-top:1px solid rgba(255,255,255,0.07);margin:28px 0;"></div>
+
+      <!-- Security note -->
+      <p style="color:#555;font-size:12px;text-align:center;margin:0;line-height:1.7;">
+        🔒 &nbsp;CHRONOS will <strong style="color:#888;">never</strong> ask for your OTP
+        via phone call, chat, or email reply.<br>
+        If you did not initiate this request, contact us immediately.
+      </p>
+
+    </td>
+  </tr>
+
+  <!-- FOOTER -->
+  <tr>
+    <td align="center" style="padding:28px 0 16px;">
+      <div style="color:#444;font-size:12px;line-height:1.8;">
+        <strong style="color:#D4AF37;">CHRONOS Luxury Watches</strong><br>
+        The Pinnacle of Horological Excellence
+      </div>
+      <div style="margin-top:14px;color:rgba(100,100,100,0.5);font-size:11px;">
+        &copy; {year} CHRONOS. All rights reserved.
+      </div>
+    </td>
+  </tr>
+
+</table>
+</td></tr>
+</table>
+</body>
+</html>"""
+
+
+def _build_otp_email_text(otp: str, minutes: int) -> str:
+    return (
+        f"CHRONOS — Verification Code\n"
+        f"{'='*40}\n\n"
+        f"Your verification code is:  {otp}\n\n"
+        f"Valid for {minutes} minutes.\n"
+        f"Do not share this code with anyone.\n\n"
+        f"— CHRONOS Luxury Watches\n"
+    )
 
 
 def _log(phone, message, provider, status, response='', error='', purpose='otp'):
@@ -129,19 +251,24 @@ def _send_twilio(phone: str, otp: str, minutes: int) -> dict:
 # Used as fallback when SMS provider is not yet activated
 # ─────────────────────────────────────────────────────────────
 def _send_email_otp(email: str, otp: str, minutes: int) -> dict:
-    """Send OTP via email to the customer. Free fallback."""
+    """Send luxury HTML OTP email to the customer."""
     if not email:
         return {'success': False, 'error': 'No email address provided'}
     try:
-        send_mail(
+        html_body = _build_otp_email_html(otp, minutes)
+        text_body = _build_otp_email_text(otp, minutes)
+
+        msg = EmailMultiAlternatives(
             subject=OTP_EMAIL_SUBJECT,
-            message=OTP_EMAIL_BODY.format(otp=otp, minutes=minutes),
+            body=text_body,
             from_email=settings.DEFAULT_FROM_EMAIL,
-            recipient_list=[email],   # ← CUSTOMER's email, not admin
-            fail_silently=False,
+            to=[email],
         )
-        _log(email, f'OTP:{otp}', 'email', 'sent', response='email_sent')
-        logger.info("[OTP] Email OTP → customer %s", email)
+        msg.attach_alternative(html_body, 'text/html')
+        msg.send(fail_silently=False)
+
+        _log(email, f'OTP:{otp}', 'email', 'sent', response='html_email_sent')
+        logger.info("[OTP] HTML Email OTP → customer %s", email)
         return {'success': True, 'via_email': True}
     except Exception as exc:
         _log(email, f'OTP:{otp}', 'email', 'failed', error=str(exc))
