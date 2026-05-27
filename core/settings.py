@@ -167,7 +167,7 @@ EMAIL_HOST_USER = clean_env('EMAIL_HOST_USER', default='')
 EMAIL_HOST_PASSWORD = clean_env('EMAIL_HOST_PASSWORD', default='')
 DEFAULT_FROM_EMAIL = clean_env('DEFAULT_FROM_EMAIL', default='CHRONOS Luxury Watches <noreply@chronos.com>')
 ADMIN_EMAIL = clean_env('ADMIN_EMAIL', default='admin@chronos.com') or 'admin@chronos.com'
-EMAIL_TIMEOUT = 10
+EMAIL_TIMEOUT = 5  # Reduced from 10 — faster SMTP connection timeout
 
 # API keys for HTTP-based custom email backends (to bypass Render's Free SMTP blocking)
 BREVO_API_KEY = clean_env('BREVO_API_KEY', default='')

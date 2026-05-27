@@ -148,7 +148,7 @@ def _info_row(label: str, value: str) -> str:
 # ─────────────────────────────────────────────────────────────────────────────
 # Core send helper
 # ─────────────────────────────────────────────────────────────────────────────
-def _send_sync(subject: str, to: str, html: str, text: str = ''):
+def _send_sync(subject: str, to: str, html: str, text: str = '', reply_to: str = ''):
     """Send a single HTML email. Falls back to plain text (synchronous, run inside a thread)."""
     try:
         msg = EmailMultiAlternatives(
@@ -156,6 +156,7 @@ def _send_sync(subject: str, to: str, html: str, text: str = ''):
             body=text or 'Please view this email in an HTML-capable client.',
             from_email=settings.DEFAULT_FROM_EMAIL,
             to=[to],
+            reply_to=[reply_to] if reply_to else [],
         )
         msg.attach_alternative(html, 'text/html')
         msg.send(fail_silently=False)
@@ -166,9 +167,9 @@ def _send_sync(subject: str, to: str, html: str, text: str = ''):
         return False
 
 
-def _send(subject: str, to: str, html: str, text: str = ''):
+def _send(subject: str, to: str, html: str, text: str = '', reply_to: str = ''):
     """Asynchronously dispatch email in a background thread to prevent blocking HTTP requests."""
-    thread = threading.Thread(target=_send_sync, args=(subject, to, html, text))
+    thread = threading.Thread(target=_send_sync, args=(subject, to, html, text, reply_to))
     thread.daemon = True
     thread.start()
     return True
@@ -359,7 +360,7 @@ def send_contact_admin_notification(name: str, email: str, subject: str, message
     {_divider()}
     <table width="100%" cellpadding="0" cellspacing="0">
       {_info_row('Name', name)}
-      {_info_row('Email', email)}
+      {_info_row('Email', f'<a href="mailto:{email}" style="color:{GOLD};text-decoration:none;">{email}</a>')}
       {_info_row('Subject', subject)}
     </table>
     {_divider()}
@@ -369,10 +370,21 @@ def send_contact_admin_notification(name: str, email: str, subject: str, message
       <p style="color:{TEXT};font-size:14px;line-height:1.7;margin:0;">{message}</p>
     </div>
     {_divider()}
-    {_para('Please respond to this enquiry within 24 hours.')}
+    <div style="text-align:center;margin:20px 0;">
+      <a href="mailto:{email}?subject=Re: {subject}&body=Dear {name},%0A%0A"
+         style="display:inline-block;background:linear-gradient(135deg,{GOLD},{DARK});
+                color:#000;font-weight:700;font-size:14px;letter-spacing:2px;text-transform:uppercase;
+                text-decoration:none;padding:14px 36px;border-radius:8px;border:1px solid {GOLD};">
+        Reply to {name}
+      </a>
+    </div>
+    <p style="color:{MUTED};font-size:12px;text-align:center;margin:0;">
+      Clicking "Reply" in your email client will also reply directly to the customer.
+    </p>
     """
     html = _base(f'New Enquiry from {name} — CHRONOS', body)
-    _send(f'[CHRONOS] New Contact: {subject}', admin_email, html)
+    # reply_to = customer email so admin can reply directly from inbox
+    _send(f'[CHRONOS] New Contact: {subject}', admin_email, html, reply_to=email)
 
 
 # ─────────────────────────────────────────────────────────────────────────────
